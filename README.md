@@ -7,7 +7,7 @@ A simple pure Python implementation for common depth-map-related operations.
 Minimal installation:
 
 ```
-pip install py_depth_tools
+pip install depth_tools
 ```
 
 Features:
