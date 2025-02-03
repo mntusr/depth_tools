@@ -32,7 +32,7 @@ jobs:
       needs: build
       environment:
         name: pypi
-        url: https://pypi.org/p/npy_unittest
+        url: https://pypi.org/p/depth_tools
       permissions:
         id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
       steps:
