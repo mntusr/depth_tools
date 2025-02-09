@@ -2,6 +2,7 @@
 A subpackage that implements the operations for the 
 """
 
+from ._align_depth import align_shift_scale
 from ._datasets import DatasetWrapper, TorchSample, move_sample_to
 from ._depth_clip import depth_clip_on_aligned_pred, depth_clip_on_mask
 from ._depth_map_dilation import is_dilation_supported
@@ -17,4 +18,5 @@ __all__ = [
     "depth_clip_on_mask",
     "move_sample_to",
     "is_dilation_supported",
+    "align_shift_scale",
 ]

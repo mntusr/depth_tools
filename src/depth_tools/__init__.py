@@ -2,6 +2,7 @@
 A package to handle the depth processing-related calculations in both Pytorch and Numpy.
 """
 
+from ._align_depth import align_shift_scale
 from ._camera import CameraIntrinsics
 from ._coord_sys import CoordSys, get_coord_sys_conv_mat
 from ._datasets import Dataset, Nyuv2Dataset, Sample, SimplifiedHypersimDataset
@@ -32,4 +33,5 @@ __all__ = [
     "Sample",
     "fast_dilate_depth_map",
     "PointSubsamplingConf",
+    "align_shift_scale",
 ]

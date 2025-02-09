@@ -8,7 +8,6 @@ from typing import (
     Final,
     Literal,
     Protocol,
-    Self,
     SupportsIndex,
     TypedDict,
     cast,
@@ -16,6 +15,7 @@ from typing import (
 
 import numpy as np
 from matplotlib import pyplot as plt
+from typing_extensions import Self
 
 from ._camera import CameraIntrinsics
 

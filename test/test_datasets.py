@@ -2,7 +2,7 @@ import io
 import unittest
 from collections.abc import Collection, Iterable, Mapping
 from pathlib import Path
-from typing import Any, Final, cast
+from typing import Any, Final, Literal, cast
 
 import h5py
 import npy_unittest
@@ -76,7 +76,15 @@ class DatasetTestCase(npy_unittest.NpyTestCase):
         height: int,
         n: int,
         custom_values: (
-            Mapping[tuple[int | slice, int | slice, int | slice, int | slice], float]
+            Mapping[
+                tuple[
+                    int | Literal[":"],
+                    int | Literal[":"],
+                    int | Literal[":"],
+                    int | Literal[":"],
+                ],
+                float,
+            ]
             | None
         ) = None,
     ) -> np.ndarray:
@@ -125,7 +133,8 @@ class DatasetTestCase(npy_unittest.NpyTestCase):
 
         if custom_values is not None:
             for custom_value_idx, custom_value in custom_values.items():
-                depths[custom_value_idx] = custom_value
+                idx = tuple((slice(None) if v == ":" else v) for v in custom_value_idx)
+                depths[idx] = custom_value
 
         return depths
 
@@ -408,14 +417,14 @@ class TestNyuv2(DatasetTestCase):
             n=self.n_images,
             custom_values={
                 (
-                    slice(None),
+                    ":",
                     0,
                     self.im_height // 2,
                     self.im_width // 2,
                 ): depth_tools.Nyuv2Dataset.NYUV2_MAX_DEPTH
                 * 5,
                 (
-                    slice(None),
+                    ":",
                     0,
                     self.im_height // 2 + 1,
                     self.im_width // 2 + 2,

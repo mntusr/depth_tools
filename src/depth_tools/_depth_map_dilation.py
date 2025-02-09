@@ -1,8 +1,9 @@
 import datetime
 import logging
-from typing import NotRequired, TypedDict
+from typing import TypedDict
 
 import numpy as np
+from typing_extensions import NotRequired
 
 from ._camera import CameraIntrinsics
 from ._coord_sys import CoordSys, get_coord_sys_conv_mat
