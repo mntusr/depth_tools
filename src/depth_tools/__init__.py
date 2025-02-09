@@ -35,3 +35,5 @@ __all__ = [
     "PointSubsamplingConf",
     "align_shift_scale",
 ]
+
+__version__ = "0.1.0"
