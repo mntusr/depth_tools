@@ -24,6 +24,10 @@ The following losses are supported:
 - MSE loss
 - MSE loss in the log space
 
+# Depth alignment
+
+The package can align the shift and scale of the predicted scalar maps to minimize the MSE error.
+
 # Point cloud operations
 
 The following point cloud operations are supported:

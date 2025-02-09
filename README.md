@@ -14,6 +14,7 @@ Features:
 
 - Loss calculation
 - Dataset handling (requires extra `Datasets`)
+- Prediction alignment
 - Depth clip implementation
 - Limited Pytorch support (requires package Pytorch)
 - Point cloud diagram creation (requires extra `Plots`)
