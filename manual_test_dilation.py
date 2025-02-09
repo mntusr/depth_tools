@@ -4,10 +4,10 @@ import time
 import webbrowser
 from pathlib import Path
 
-import cv2
-import depth_tools
 import numpy as np
 from matplotlib import pyplot as plt
+
+import depth_tools
 
 
 def main():
