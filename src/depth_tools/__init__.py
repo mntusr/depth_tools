@@ -36,4 +36,4 @@ __all__ = [
     "align_shift_scale",
 ]
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
