@@ -1,3 +1,5 @@
 .vscode
 *.pyc
 .venv
+dist
+src/depth_tools.egg-info
