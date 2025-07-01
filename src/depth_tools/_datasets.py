@@ -18,6 +18,10 @@ from matplotlib import pyplot as plt
 from typing_extensions import Self
 
 from ._camera import CameraIntrinsics
+from ._nyuv2_util_internal import (
+    decode_nyuv2_hdf5_str_list_unchecked,
+    decode_nyuv2_split_idx_list_unchecked,
+)
 
 if TYPE_CHECKING:
     import h5py
@@ -84,17 +88,19 @@ class Nyuv2Dataset:
 
         if virtual_files is None:
             h5_file = h5py.File(str(labeled_mat_path), "r")
-            train_test = scipy.io.loadmat(str(splits_mat_path))
+            train_test: np.ndarray = scipy.io.loadmat(str(splits_mat_path))
         else:
             h5_file = virtual_files["nyu_depth_v2_labeled"]
             train_test_io = io.BytesIO(virtual_files["splits"])
-            train_test = scipy.io.loadmat(train_test_io)
+            train_test: np.ndarray = scipy.io.loadmat(train_test_io)
 
         ndx_key = {"test": "testNdxs", "train": "trainNdxs"}[split]
-        self._split_im_idxs = [int(x) for x in train_test[ndx_key]]
+        self._split_im_idxs = decode_nyuv2_split_idx_list_unchecked(train_test[ndx_key])
         self._raw_depths = cast(h5py.Dataset, h5_file["rawDepths"])
         self._images = cast(h5py.Dataset, h5_file["images"])
-        self._scenes: list[str] = ["".join(chr(c[0]) for c in h5_file[obj_ref]) for obj_ref in h5_file["sceneTypes"][0]]  # type: ignore
+        self._scenes: list[str] = decode_nyuv2_hdf5_str_list_unchecked(
+            h5_file, "sceneTypes"
+        )
         self.add_black_frame = add_black_frame
         self.path_start = split
         self._h5_file = h5_file
@@ -308,7 +314,7 @@ class SimplifiedHypersimDataset:
 
     @staticmethod
     def _extract_scenes_from_split(
-        split: Iterable[tuple[str, str, str]]
+        split: Iterable[tuple[str, str, str]],
     ) -> frozenset[str]:
         scenes: set[str] = set()
         for sample in split:
