@@ -1,3 +1,6 @@
+![Unit tests badge](https://github.com/mntusr/depth_tools/actions/workflows/unit-tests.yml/badge.svg)
+
+
 [Documentation](./doc)
 
 # Depth Tools
