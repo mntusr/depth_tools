@@ -19,6 +19,8 @@ jobs:
           uses: actions/setup-python@v5
           with:
             python-version: "3.x"
+        - name: Echo hello
+          run: echo hello
         - name: Install dependencies
           run: |
             "echo hello"
