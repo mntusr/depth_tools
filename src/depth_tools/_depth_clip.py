@@ -60,8 +60,6 @@ class DepthClip:
         ValueError
             If the argument verification is enabled and the depth array does not have the correct dtype.
         """
-        raise RuntimeError("expected failure")
-
         if verify_args:
             if not np.issubdtype(aligned_preds.dtype, np.floating):
                 raise ValueError(
