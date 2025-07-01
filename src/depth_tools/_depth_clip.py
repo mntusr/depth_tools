@@ -46,14 +46,14 @@ class DepthClip:
         Parameters
         -----------
         aligned_preds
-            The aligned depth predictions. Format: ``SingleArray_Scalar``
+            The aligned depth predictions. Format: any floating point array that contaisn depth values
         verify_args
             If true, then the function checks the array dtype.
 
         Returns
         -------
         v
-            The clipped aligned depths. Format: ``SingleArray_Scalar``
+            The clipped aligned depths. Format: any array
 
         Raises
         ------
@@ -85,9 +85,9 @@ class DepthClip:
         Parameters
         ----------
         gt_depth
-            The ground truth depth values. Format: Format: ``SingleArray_Scalar``
+            The ground truth depth values. Format: any floating point array that contaisn depth values
         mask
-            The ground truth mask. Format: ``SingleArray_Mask`` and its shape should be the same as ``gt_depth``
+            The ground truth mask. Format: any boolean of floating array with shape equal to ``gt_depth``
 
         Raises
         ------

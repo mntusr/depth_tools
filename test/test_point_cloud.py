@@ -1,9 +1,8 @@
 import unittest
 from typing import Any
 
-import numpy as np
-
 import depth_tools
+import numpy as np
 
 from .testutil import TestBase
 
@@ -69,7 +68,7 @@ class TestPointCloud(TestBase):
 
         color_list_for_rgb_points = []
         for pt in self.h_points_for_non_masked_pixels:
-            int_depth = int(pt[2])  # type: ignore
+            int_depth = int(pt[2])
             pt_x = (int_depth - 1) % 3
             pt_y = (int_depth - 1) // 3
 

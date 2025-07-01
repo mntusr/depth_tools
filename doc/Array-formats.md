@@ -80,21 +80,6 @@ Dtype: floating
 
 The array contains a single scalar value for each element.
 
-# SingleArray
-
-## SingleArray_Scalar
-
-Dimensions: not specified
-
-Dtype: floating
-
-## SingleArray_Scalar
-
-Dimensions: not specified
-
-Dtype: boolean
-
-
 # Indices
 
 Dimensions: `(N,)`, where:

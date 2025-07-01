@@ -1,21 +1,4 @@
-# The file is automatically generated from src\depth_tools\_losses.py; do not edit.
-from typing import Protocol, Sequence, SupportsIndex
-
 import torch
-
-from ._format_checks_internal import is_bool_array, is_floating_array
-
-
-class DepthLoss(Protocol):
-    def __call__(
-        self,
-        *,
-        pred: torch.Tensor,
-        gt: torch.Tensor,
-        mask: torch.Tensor,
-        first_dim_separates: bool = False,
-        verify_args: bool = False,
-    ) -> torch.Tensor: ...
 
 
 def dx_loss(
@@ -24,11 +7,10 @@ def dx_loss(
     gt: torch.Tensor,
     mask: torch.Tensor,
     x: float,
-    first_dim_separates: bool = False,
     verify_args: bool = False,
 ) -> torch.Tensor:
     """
-    Calculate the non-differentiable $\\delta_x$ loss.
+    Calculate the non-differentiable $\\delta_x$ loss. Unlike the similar Pytorch function, this function does not do any aggregation.
 
     This function expects the arguments to have the same shape, so broadcast is not necessary.
 
@@ -37,15 +19,13 @@ def dx_loss(
     Parameters
     ----------
     pred
-        The predicted values. Format: the array should contain floating data. If ``first_dim_separates``, then it should have at least two dimensions.
+        The predicted values. Format: ``Ims_Scalar`` or ``Im_Scalar``
     gt
-        The ground truth values. Format: the array should contain floating data. If ``first_dim_separates``, then it should have at least two dimensions. It should have the same shape as the predicted values.
+        The ground truth values. Format: ``Ims_Scalars`` or ``Im_Scalar``
     mask
-        The masks that select the relevant pixels. Format: the array should contain boolean data. If ``first_dim_separates``, then it should have at least two dimensions. It should have the same shape as the predicted values.
+        The masks that select the relevant pixels. Format: ``Ims_Mask`` or ``Ims_FloatMask``
     x
         The ``x`` parameter of the loss.
-    first_dim_separates
-        If this is true, then the loss calculation is done for each element along dimension 0 individually. Otherwise the claculation is done for the whole array globally.
     verify_args
         If this is true, then the function verifies the arguments and raises errors if the shapes or data types are incorrect. Otherwise the possible errors are treated as implementation detail.
 
@@ -55,19 +35,17 @@ def dx_loss(
         The final losses. Format: ``Scalars``
     """
     if verify_args:
-        _verify_loss_args(
-            gt=gt, pred=pred, mask=mask, first_dim_separates=first_dim_separates
-        )
+        _verify_loss_args(gt=gt, pred=pred, mask=mask)
 
     deltas = torch.zeros_like(pred)
     deltas[mask] = torch.maximum(pred[mask] / gt[mask], gt[mask] / pred[mask])
 
     loss_vals: torch.Tensor = deltas < (1.25**x)
-    loss_vals = loss_vals.to(pred.dtype)
+    loss_vals[~mask] = False
 
-    return _calculate_masked_mean_unchecked(
-        values=loss_vals, mask=mask, first_dim_separates=first_dim_separates
-    )
+    loss_vals = torch.sum(loss_vals, dim=(-2, -1)) / torch.sum(mask, dim=(-2, -1))
+    loss_vals = torch.squeeze(loss_vals, dim=-1)
+    return loss_vals
 
 
 def mse_loss(
@@ -75,7 +53,6 @@ def mse_loss(
     pred: torch.Tensor,
     gt: torch.Tensor,
     mask: torch.Tensor,
-    first_dim_separates: bool = False,
     verify_args: bool = False,
 ) -> torch.Tensor:
     """
@@ -88,13 +65,11 @@ def mse_loss(
     Parameters
     ----------
     pred
-        The predicted values. Format: the array should contain floating data. If ``first_dim_separates``, then it should have at least two dimensions.
+        The predicted values. Format: ``Ims_Scalar`` or ``Im_Scalar``
     gt
-        The ground truth values. Format: the array should contain floating data. If ``first_dim_separates``, then it should have at least two dimensions. It should have the same shape as the predicted values.
+        The ground truth values. Format: ``Ims_Scalars`` or ``Im_Scalar``
     mask
-        The masks that select the relevant pixels. Format: the array should contain boolean data. If ``first_dim_separates``, then it should have at least two dimensions. It should have the same shape as the predicted values.
-    first_dim_separates
-        If this is true, then the loss calculation is done for each element along dimension 0 individually. Otherwise the claculation is done for the whole array globally.
+        The masks that select the relevant pixels. Format: ``Ims_Mask`` or ``Ims_FloatMask``
     verify_args
         If this is true, then the function verifies the arguments and raises errors if the shapes or data types are incorrect. Otherwise the possible errors are treated as implementation detail.
 
@@ -104,23 +79,17 @@ def mse_loss(
         The final losses. Format: ``Scalars``
     """
     if verify_args:
-        _verify_loss_args(
-            gt=gt, pred=pred, mask=mask, first_dim_separates=first_dim_separates
-        )
+        _verify_loss_args(gt=gt, pred=pred, mask=mask)
 
     x = (pred - gt) ** 2
-
-    return _calculate_masked_mean_unchecked(
-        values=x, mask=mask, first_dim_separates=first_dim_separates
-    )
+    x = x * mask
+    x = torch.sum(x, dim=(-2, -1)) / torch.sum(mask, dim=(-2, -1))
+    x = torch.squeeze(x, dim=-1)
+    return x
 
 
 def mse_log_loss(
-    pred: torch.Tensor,
-    gt: torch.Tensor,
-    mask: torch.Tensor,
-    first_dim_separates: bool = False,
-    verify_args: bool = True,
+    pred: torch.Tensor, gt: torch.Tensor, mask: torch.Tensor, verify_args: bool = True
 ) -> torch.Tensor:
     """
     Calculate the masked MSE loss. Unlike the similar Pytorch function, this function does not do any aggregation.
@@ -132,13 +101,11 @@ def mse_log_loss(
     Parameters
     ----------
     pred
-        The predicted values. Format: the array should contain floating data. If ``first_dim_separates``, then it should have at least two dimensions.
+        The predicted values. Format: ``Ims_Scalar`` or ``Im_Scalar``
     gt
-        The ground truth values. Format: the array should contain floating data. If ``first_dim_separates``, then it should have at least two dimensions. It should have the same shape as the predicted values.
+        The ground truth values. Format: ``Ims_Scalars`` or ``Im_Scalar``
     mask
-        The masks that select the relevant pixels. Format: the array should contain boolean data. If ``first_dim_separates``, then it should have at least two dimensions. It should have the same shape as the predicted values.
-    first_dim_separates
-        If this is true, then the loss calculation is done for each element along dimension 0 individually. Otherwise the claculation is done for the whole array globally.
+        The masks that select the relevant pixels. Format: ``Ims_Mask`` or ``Ims_FloatMask``
     verify_args
         If this is true, then the function verifies the arguments and raises errors if the shapes or data types are incorrect. Otherwise the possible errors are treated as implementation detail.
 
@@ -148,75 +115,50 @@ def mse_log_loss(
         The final losses. Format: ``Scalars_Float``
     """
     if verify_args:
-        _verify_loss_args(
-            gt=gt, pred=pred, mask=mask, first_dim_separates=first_dim_separates
-        )
+        _verify_loss_args(gt=gt, pred=pred, mask=mask)
     x = (torch.log(pred) - torch.log(gt)) ** 2
+    x = x * mask
+    x = torch.sum(x, dim=(-2, -1)) / torch.sum(mask, dim=(-2, -1))
+    x = torch.squeeze(x, dim=-1)
+    return x
 
-    return _calculate_masked_mean_unchecked(
-        values=x, mask=mask, first_dim_separates=first_dim_separates
-    )
 
-
-def _verify_loss_args(
-    pred: torch.Tensor, gt: torch.Tensor, mask: torch.Tensor, first_dim_separates: bool
-) -> None:
+def _verify_loss_args(pred: torch.Tensor, gt: torch.Tensor, mask: torch.Tensor) -> None:
     """
     Throws `ValueError` if the loss arguments do not have the proper format.
-    """
-    if pred.shape != gt.shape:
-        raise ValueError(
-            f"The shape of the ground truths ({gt.shape}) is not equal the shape of the predictions ({tuple(pred.shape)})."
-        )
-    if mask.shape != pred.shape:
-        raise ValueError(
-            f"The shape of the mask ({mask.shape}) is not equal the shape of the predictions ({tuple(pred.shape)})."
-        )
-
-    if not is_floating_array(pred):
-        raise ValueError(
-            f"The prediction tensor does not contain floating point data. Dtype: {pred.dtype}"
-        )
-    if not is_floating_array(gt):
-        raise ValueError(
-            f"The ground truth tensor does not contain floating point data. Dtype: {gt.dtype}"
-        )
-    if not is_bool_array(mask):
-        raise ValueError(
-            f"The mask tensor contains neither floating point, nor boolean data. Dtype: {mask.dtype}"
-        )
-    if first_dim_separates and (len(pred.shape) < 2):
-        raise ValueError(
-            f"The prediction array should be at least two dimensional if the first dimension separates the samples. The current shape of the prediction array: {tuple(pred.shape)}"
-        )
-
-
-def _calculate_masked_mean_unchecked(
-    values: torch.Tensor,
-    mask: torch.Tensor,
-    first_dim_separates: bool = False,
-) -> torch.Tensor:
-    """
-    A function that calculates the masked mean of the given values.
-
-    This function does not check its arguments.
 
     Parameters
     ----------
-    values
-        The values of which the mean should be calculated. Format: the array should contain floating data. If ``first_dim_separates``, then it should have at least two dimensions. It should have the same shape as the predicted values.
+    pred
+        The predicted values. Format: ``Ims_Scalar`` or ``Im_Scalar``
+    gt
+        The ground truth values. Format: ``Ims_Scalars`` or ``Im_Scalar``
     mask
-        The masks that select the relevant values. Format: the array should contain boolean data. If ``first_dim_separates``, then it should have at least two dimensions. It should have the same shape as the predicted values.
-    first_dim_separates
-        If this is true, then the mean calculation is done for each element along dimension 0 individually. Otherwise the claculation is done for the whole array globally.
+        The masks that select the relevant pixels. Format: ``Ims_Mask`` or ``Ims_FloatMask``
     """
+    if pred.shape != gt.shape:
+        raise ValueError(
+            f"The shape of the ground truths ({gt.shape}) is not equal the shape of the predictions ({pred.shape})."
+        )
+    if mask.shape != pred.shape:
+        raise ValueError(
+            f"The shape of the mask ({mask.shape}) is not equal the shape of the predictions ({pred.shape})."
+        )
 
-    if first_dim_separates:
-        dim = tuple(values.shape)[1:]
-    else:
-        dim = None
-
-    values = values * mask
-    return values.mean(dim=dim) * (
-        torch.ones_like(values).sum(dim=dim) / mask.to(values.dtype).sum(dim=dim)
-    )
+    if len(pred.shape) not in [3, 4]:
+        raise ValueError("The predictions should be 3-or 4 dimensional.")
+    
+    if not pred.is_floating_point():
+        raise ValueError(
+            f"The prediction tensor does not contain floating point data. Dtype: {pred.dtype}"
+        )
+    
+    if not gt.is_floating_point():
+        raise ValueError(
+            f"The ground truth tensor does not contain floating point data. Dtype: {gt.dtype}"
+        )
+    
+    if not (mask.is_floating_point() or (mask.dtype == torch.bool)):
+        raise ValueError(
+            f"The mask tensor contains neither floating point, nor boolean data. Dtype: {mask.dtype}"
+        )
