@@ -26,7 +26,7 @@ def main():
     depth[~mask] = 0
     transformed_depth = depth * 6 + 8
     restored_depth, _, _ = depth_tools.align_shift_scale(
-        control_mask=None, gt_map=depth, mask=mask, pred_map=transformed_depth
+        control_mask=None, gt_values=depth, mask=mask, pred_values=transformed_depth
     )
 
     print("Verify that the aligned depth and the original depth are the same.")

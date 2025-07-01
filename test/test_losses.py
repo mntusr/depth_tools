@@ -1,7 +1,8 @@
-import depth_tools
-import depth_tools.pt
 import numpy as np
 import torch
+
+import depth_tools
+import depth_tools.pt
 
 from .testutil import TestBase
 
@@ -124,13 +125,53 @@ class TestLosses(TestBase):
 
     def test_dx_loss__np__happy_path(self) -> None:
         actual_d001_losses = depth_tools.dx_loss(
-            pred=self.pred, gt=self.gt, mask=self.mask, x=0.01
+            pred=self.pred, gt=self.gt, mask=self.mask, x=0.01, first_dim_separates=True
         )
         actual_d100_losses = depth_tools.dx_loss(
-            pred=self.pred, gt=self.gt, mask=self.mask, x=100
+            pred=self.pred, gt=self.gt, mask=self.mask, x=100, first_dim_separates=True
         )
         self.assertAllclose(actual_d001_losses, self.expected_d001_losses)
         self.assertAllclose(actual_d100_losses, self.expected_d100_losses)
+
+    def test_dx_loss__np__not_enough_dimensions(self) -> None:
+        with self.assertRaises(ValueError) as cm:
+            depth_tools.dx_loss(
+                pred=self.pred.flatten(),
+                gt=self.gt.flatten(),
+                mask=self.mask.flatten(),
+                x=0.01,
+                first_dim_separates=True,
+                verify_args=True,
+            )
+
+        msg = str(cm.exception)
+
+        self.assertIn("The prediction array should be at least two dimensional", msg)
+
+    def test_dx_loss__pt__not_enough_dimensions(self) -> None:
+        with self.assertRaises(ValueError) as cm:
+            depth_tools.pt.dx_loss(
+                pred=torch.from_numpy(self.pred.flatten()),
+                gt=torch.from_numpy(self.gt.flatten()),
+                mask=torch.from_numpy(self.mask.flatten()),
+                x=0.01,
+                first_dim_separates=True,
+                verify_args=True,
+            )
+
+        msg = str(cm.exception)
+
+        self.assertIn("The prediction array should be at least two dimensional", msg)
+
+    def test_dx_loss__np__happy_path_single_value(self) -> None:
+        actual_d001_losses = depth_tools.dx_loss(
+            pred=self.pred[0], gt=self.gt[0], mask=self.mask[0], x=0.01
+        )
+        actual_d100_losses = depth_tools.dx_loss(
+            pred=self.pred[0], gt=self.gt[0], mask=self.mask[0], x=100
+        )
+        self.assertAllclose(actual_d001_losses, self.expected_d001_losses[0])
+        self.assertAllclose(actual_d100_losses, self.expected_d100_losses[0])
 
     def test_dx_loss__pt__happy_path(self) -> None:
         with torch.no_grad():
@@ -139,11 +180,15 @@ class TestLosses(TestBase):
                 gt=torch.from_numpy(self.gt),
                 mask=torch.from_numpy(self.mask),
                 x=0.01,
+                first_dim_separates=True,
+                verify_args=True,
             ).numpy()
             actual_d100_losses = depth_tools.pt.dx_loss(
                 pred=torch.from_numpy(self.pred),
                 gt=torch.from_numpy(self.gt),
                 mask=torch.from_numpy(self.mask),
+                first_dim_separates=True,
+                verify_args=True,
                 x=100,
             ).numpy()
 
@@ -170,9 +215,15 @@ class TestLosses(TestBase):
 
     def test_mse_loss__np__happy_path(self):
         actual_mse_losses = depth_tools.mse_loss(
-            pred=self.pred, gt=self.gt, mask=self.mask
+            pred=self.pred, gt=self.gt, mask=self.mask, first_dim_separates=True
         )
         self.assertAllclose(actual_mse_losses, self.expected_mse_losses)
+
+    def test_mse_loss__np__happy_path__single_value(self):
+        actual_mse_losses = depth_tools.mse_loss(
+            pred=self.pred[0], gt=self.gt[0], mask=self.mask[0]
+        )
+        self.assertAllclose(actual_mse_losses, self.expected_mse_losses[0])
 
     def test_mse_loss__pt__happy_path(self):
         with torch.no_grad():
@@ -180,8 +231,38 @@ class TestLosses(TestBase):
                 pred=torch.from_numpy(self.pred),
                 gt=torch.from_numpy(self.gt),
                 mask=torch.from_numpy(self.mask),
+                first_dim_separates=True,
+                verify_args=True,
             ).numpy()
         self.assertAllclose(actual_mse_losses, self.expected_mse_losses)
+
+    def test_mse_loss__np__not_enough_dimensions(self) -> None:
+        with self.assertRaises(ValueError) as cm:
+            depth_tools.mse_loss(
+                pred=self.pred.flatten(),
+                gt=self.gt.flatten(),
+                mask=self.mask.flatten(),
+                first_dim_separates=True,
+                verify_args=True,
+            )
+
+        msg = str(cm.exception)
+
+        self.assertIn("The prediction array should be at least two dimensional", msg)
+
+    def test_mse_loss__pt__not_enough_dimensions(self) -> None:
+        with self.assertRaises(ValueError) as cm:
+            depth_tools.pt.mse_loss(
+                pred=torch.from_numpy(self.pred.flatten()),
+                gt=torch.from_numpy(self.gt.flatten()),
+                mask=torch.from_numpy(self.mask.flatten()),
+                first_dim_separates=True,
+                verify_args=True,
+            )
+
+        msg = str(cm.exception)
+
+        self.assertIn("The prediction array should be at least two dimensional", msg)
 
     def test_mse_loss__np__invalid_arrays(self):
         def fn(pred, gt, mask):
@@ -197,13 +278,14 @@ class TestLosses(TestBase):
                     gt=torch.from_numpy(gt),
                     mask=torch.from_numpy(mask),
                     verify_args=True,
+                    first_dim_separates=True,
                 )
 
         self.probe_invalid_inputs([self.pred, self.gt, self.mask], fn)
 
     def test_mse_log_loss__np__happy_path(self):
         actual_mse_log_losses = depth_tools.mse_log_loss(
-            pred=self.pred, gt=self.gt, mask=self.mask
+            pred=self.pred, gt=self.gt, mask=self.mask, first_dim_separates=True
         )
         self.assertAllclose(actual_mse_log_losses, self.expected_mse_log_losses)
 
@@ -213,8 +295,38 @@ class TestLosses(TestBase):
                 pred=torch.from_numpy(self.pred),
                 gt=torch.from_numpy(self.gt),
                 mask=torch.from_numpy(self.mask),
+                first_dim_separates=True,
+                verify_args=True,
             ).numpy()
         self.assertAllclose(actual_mse_log_losses, self.expected_mse_log_losses)
+
+    def test_mse_log_loss__np__not_enough_dimensions(self) -> None:
+        with self.assertRaises(ValueError) as cm:
+            depth_tools.mse_log_loss(
+                pred=self.pred.flatten(),
+                gt=self.gt.flatten(),
+                mask=self.mask.flatten(),
+                first_dim_separates=True,
+                verify_args=True,
+            )
+
+        msg = str(cm.exception)
+
+        self.assertIn("The prediction array should be at least two dimensional", msg)
+
+    def test_mse_log_loss__pt__not_enough_dimensions(self) -> None:
+        with self.assertRaises(ValueError) as cm:
+            depth_tools.pt.mse_log_loss(
+                pred=torch.from_numpy(self.pred.flatten()),
+                gt=torch.from_numpy(self.gt.flatten()),
+                mask=torch.from_numpy(self.mask.flatten()),
+                first_dim_separates=True,
+                verify_args=True,
+            )
+
+        msg = str(cm.exception)
+
+        self.assertIn("The prediction array should be at least two dimensional", msg)
 
     def test_mse_log_loss__np__invalid_arrays(self):
         def fn(pred, gt, mask):
