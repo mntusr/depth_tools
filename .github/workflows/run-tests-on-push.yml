@@ -21,6 +21,6 @@ jobs:
             python-version: "3.x"
         - name: Install dependencies
           run: |
-            "pip install torch torchvision torchaudio"
-            "pip install '.[Datasets, Plots]'"
+            "python -m pip install torch torchvision torchaudio"
+            "python -m pip install '.[Datasets, Plots]'"
             "python -m unittest discover -v -s . -p test_*.py"
