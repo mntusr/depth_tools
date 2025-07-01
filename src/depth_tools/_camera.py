@@ -215,7 +215,7 @@ class CameraIntrinsics:
             dtype=P.dtype,
         )
 
-        ndc_2_px = np.matrix(
+        ndc_2_px = np.array(
             [
                 [0.5 * (im_width - 1), 0, 0, 0.5 * (im_width - 1)],
                 [0, 0.5 * (im_height - 1), 0, 0.5 * (im_height - 1)],
