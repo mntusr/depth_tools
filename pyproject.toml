@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "depth_tools"
 version = "0.2.2"
 dependencies = [
-    "numpy",
+    "numpy >= 1.24.0",
     "typing-extensions >= 4.0.0"
 ]
 requires-python = ">= 3.10"
@@ -23,8 +23,8 @@ classifiers = [
 Homepage = "https://github.com/mntusr/depth_tools"
 
 [project.optional-dependencies]
-Datasets = ["scipy", "h5py", "Pillow", "pandas"]
-Plots = ["matplotlib", "plotly"]
+Datasets = ["scipy >= 1.9.0", "h5py >= 3.7.0", "Pillow >= 9.3.0", "pandas >= 1.5.0"]
+Plots = ["matplotlib >= 3.6.0", "plotly >= 5.13.0"]
 
 [tool.isort]
 profile = "black"
