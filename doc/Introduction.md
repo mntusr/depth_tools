@@ -8,7 +8,7 @@ The different kinds of arrays are documented at a [dedicated file](Array-formats
 - `Im_Depth`: The array contains a depth map. Not all pixels are meaningful, the meaningful pixels are selected using a mask.
 - `Im_Mask`: The array selects some pixels from an image.
 
-The package assumes a simple pinhole camera model. The focal length and optical center values are given in pixels. The class that describes a camera is `CameraIntrinsics`. Negative focal lengths are meaningful and mean mirroring.
+The package assumes a simple pinhole camera model. The focal length and optical center values are given in pixels. The class that describes a camera is `CameraIntrinsics`. Negative focal lengths are not supported.
 
 Main areas:
 

@@ -53,8 +53,6 @@ def fast_dilate_depth_map(
         If any of the arrays does not have the proper format.
 
         If the radius is negative.
-    NotImplementedError
-        If any of the focal lengths of the camera is negative.
 
     Notes
     -----
@@ -63,10 +61,6 @@ def fast_dilate_depth_map(
     if r < 0:
         raise ValueError(f"The radius of the approximated sphere ({r}) is negative.")
 
-    if (intrinsics.f_x < 0) or (intrinsics.f_y < 0):
-        raise NotImplementedError(
-            f"The depth map dilation is not yet implemented for cameras with negative horizontal or vertical focal lengths. Camera: {intrinsics}"
-        )
     if not np.issubdtype(depth_map.dtype, np.floating):
         raise ValueError(
             f"The depth map does not have format Im_Depth. The dtype is not floating. Dtype: {depth_map.dtype}"

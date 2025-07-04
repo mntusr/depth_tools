@@ -3,5 +3,8 @@ The Pytorch implementation of some functions are generated automatically from th
 - `depth_tools/_losses.py`
 - `depth_tools/_align_depth.py`
 - `depth_tools/_normalize_values.py`
+- `depth_tools/_dist_maps.py`
 
 This means that the Numpy implementation should specially written in a way that makes this automatic conversion possible. In other words: 1) The Numpy implementation should consider the gradient calculation of Pytorch too. 2) If a Numpy function behaves slightly differently than the Pytorch equivalent, then this function should be abstracted away into to non-converted files that provide framework-agnostic behavior.
+
+An other consequence is that the signatures and relative locations of the functions used by the converted Numpy functions should be the same for the Numpy and Pytorch versions or the conversion script should do an additional conversion.

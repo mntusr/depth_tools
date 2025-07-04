@@ -21,7 +21,7 @@ class CameraIntrinsics:
     * All camera parameters are given in pixels.
     * The center of the bottom left pixel of the projected image is at the ``(0.5, 0.5)`` coordinate.
 
-    The negative focal lengths mean flipped image.
+    The negative focal lengths are not supported.
 
     Parameters
     ----------
@@ -33,6 +33,11 @@ class CameraIntrinsics:
         The X coordinate of the optical center of the camera.
     c_y
         The Y coordinate of the optical center of the camera.
+
+    Raises
+    ------
+    ValueError
+        If any of the focal lengths is negative.
     """
 
     f_x: float
@@ -54,6 +59,16 @@ class CameraIntrinsics:
     """
     The Y coordinate of the optical center of the camera in pixel.
     """
+
+    def __post_init__(self):
+        if self.f_x < 0:
+            raise ValueError(
+                f"The x focal length should be positive. Current focal length: {self.f_x}"
+            )
+        if self.f_y < 0:
+            raise ValueError(
+                f"The y focal length should be positive. Current focal length: {self.f_y}"
+            )
 
     @staticmethod
     def from_fov(

@@ -1,6 +1,6 @@
 {
 	"format": {
 		"prefix": "format",
-		"body": "${1|Im,Im_RGB,Im_Mask,Im_Scalar,Im_FloatMask,Im_Depth,Im_Dist,Im_VS,Ims,Ims_RGB,Ims_Mask,Ims_Scalar,Ims_FloatMask,Ims_Depth,Ims_Dist,Ims_VS,Scalars,SingleArray,SingleArray_Scalar,Indices,Matrix,Matrix_3x3,Matrix_4x4,MatrixI,MatrixI_3x3|}"
+		"body": "${1|Im,Im_RGB,Im_Mask,Im_Scalar,Im_FloatMask,Im_Depth,Im_Dist,Im_VS,Ims,Ims_RGB,Ims_Mask,Ims_Scalar,Ims_FloatMask,Ims_Depth,Ims_Dist,Ims_VS,Immult,Imsmult,Scalars,SingleArray,SingleArray_Scalar,Indices,Matrix,Matrix_3x3,Matrix_4x4,MatrixI,MatrixI_3x3|}"
 	}
 }

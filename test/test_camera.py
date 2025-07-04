@@ -36,3 +36,19 @@ class TestCamera(TestBase):
         expected_prod = np.eye(3, dtype=np.float32)
 
         self.assertAllclose(mat @ mat_inv, expected_prod)
+
+    def test_focal_length_validation__x(self):
+        with self.assertRaises(ValueError) as cm:
+            depth_tools.CameraIntrinsics(f_x=-1, f_y=1, c_x=100, c_y=100)
+
+        msg = str(cm.exception)
+        self.assertIn("The x focal length should be positive.", msg)
+        self.assertIn("-1", msg)
+
+    def test_focal_length_validation__y(self):
+        with self.assertRaises(ValueError) as cm:
+            depth_tools.CameraIntrinsics(f_x=1, f_y=-1, c_x=100, c_y=100)
+
+        msg = str(cm.exception)
+        self.assertIn("The y focal length should be positive.", msg)
+        self.assertIn("-1", msg)

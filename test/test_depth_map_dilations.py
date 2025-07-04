@@ -1,16 +1,17 @@
 import unittest
 from typing import Any
 
-import depth_tools
-import depth_tools.pt
 import npy_unittest
 import numpy as np
 import torch
+from matplotlib import pyplot as plt
+
+import depth_tools
+import depth_tools.pt
 from depth_tools._depth_map_dilation import (
     _draw_axis_aligned_cube_front_faces_lh_yup_unchecked,
     _get_sphere_dz_map_unchecked,
 )
-from matplotlib import pyplot as plt
 
 
 class TestDepthMapDilation(npy_unittest.NpyTestCase):
@@ -257,34 +258,6 @@ class TestDepthMapDilation(npy_unittest.NpyTestCase):
 
         self.assertIn("radius of the approximated sphere", str(cm.exception))
 
-    def test_fast_dilate_depth_map__negative_cam_f(self) -> None:
-        depth = np.ones((1, 200, 300), dtype=np.float32)
-        mask = np.full(depth.shape, True)
-
-        cases = [
-            ("negative_f_x", -1, 1),
-            ("negative_f_y", 1, -1),
-        ]
-
-        for case_name, f_x_mult, f_y_mult in cases:
-            with self.subTest(case_name):
-                intrinsics = depth_tools.CameraIntrinsics(
-                    c_x=150, c_y=100, f_x=100 * f_x_mult, f_y=100 * f_y_mult
-                )
-
-                with self.assertRaises(NotImplementedError) as cm:
-                    depth_tools.fast_dilate_depth_map(
-                        depth_map=depth,
-                        depth_mask=mask,
-                        intrinsics=intrinsics,
-                        occlusion_subsampling=None,
-                        r=3,
-                    )
-
-                self.assertIn(
-                    "negative horizontal or vertical focal lengths", str(cm.exception)
-                )
-
     def test_fast_dilate_depth_map__masking(self) -> None:
         depth1 = np.full((1, 300, 400), 10, dtype=np.float32)
         depth2 = np.full((1, 300, 400), 10, dtype=np.float32)
@@ -304,25 +277,6 @@ class TestDepthMapDilation(npy_unittest.NpyTestCase):
 
         self.assertAllclose(dilated1[mask], dilated2[mask])
         self.assertAlmostEqual(dilated2[:, 150, 200], 0, delta=1e-4)
-
-    def test_fast_dilate_depth_map__mirroring_cameras_rejected(self) -> None:
-        depth = np.full((1, 300, 400), 10, dtype=np.float32)
-        mask = np.full(depth.shape, True)
-
-        cameras = [
-            ("mirror_x", depth_tools.CameraIntrinsics(f_x=-1, f_y=1, c_x=100, c_y=100)),
-            ("morror_y", depth_tools.CameraIntrinsics(f_x=1, f_y=-1, c_x=100, c_y=100)),
-        ]
-
-        for subtest_name, camera in cameras:
-            with self.subTest(subtest_name):
-                with self.assertRaises(NotImplementedError):
-                    depth_tools.fast_dilate_depth_map(
-                        r=2.5,
-                        depth_map=depth,
-                        depth_mask=mask,
-                        intrinsics=camera,
-                    )
 
     def test_fast_dilate_depth_map__no_cube(self):
         depth = np.full((1, 300, 400), 10, dtype=np.float32)

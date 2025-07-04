@@ -8,6 +8,7 @@ from ._coord_sys import CoordSys, get_coord_sys_conv_mat
 from ._datasets import Dataset, Nyuv2Dataset, Sample, SimplifiedHypersimDataset
 from ._depth_clip import DepthClip
 from ._depth_map_dilation import fast_dilate_depth_map
+from ._dist_maps import depth_map_2_dist_map, dist_map_2_depth_map
 from ._losses import DepthLoss, dx_loss, mse_log_loss, mse_loss
 from ._normalize_values import normalize_values
 from ._point_cloud import (
@@ -37,6 +38,8 @@ __all__ = [
     "align_shift_scale",
     "normalize_values",
     "DepthLoss",
+    "dist_map_2_depth_map",
+    "depth_map_2_dist_map",
 ]
 
 __version__ = "0.3.0"

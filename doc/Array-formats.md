@@ -156,6 +156,28 @@ Number of channels: 1
 
 The array contains the view-space position for each pixel selected by a mask.
 
+# Immult
+
+Shape: ``(1, H, W)``, where:
+
+* ``H``: The vertical coordiante.
+* ``W``: The horizontal coordinate.
+
+Dtype: floating
+
+This array can be used to multiply an image pixelwise.
+
+# Imsmult
+
+Shape: ``(1, 1, H, W)``, where:
+
+* ``H``: The vertical coordiante.
+* ``W``: The horizontal coordinate.
+
+Dtype: floating
+
+This array can be used to multiply multiple images pixelwise.
+
 # Scalars
 
 Dimensions: `(N,)`, where:

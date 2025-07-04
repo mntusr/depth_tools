@@ -27,6 +27,7 @@ def patch_file(src_path: Path) -> None:
     content = content.replace("np.nanmedian(", "torch.nanmedian(")
     content = content.replace("keepdims=", "keepdim=")
     content = content.replace("np.mean(", "torch.mean(")
+    content = content.replace("from ._camera", "from .._camera")
 
     target_path.write_text(content)
 
@@ -35,6 +36,7 @@ def main():
     patch_file(Path("src/depth_tools/_losses.py"))
     patch_file(Path("src/depth_tools/_align_depth.py"))
     patch_file(Path("src/depth_tools/_normalize_values.py"))
+    patch_file(Path("src/depth_tools/_dist_maps.py"))
 
 
 if __name__ == "__main__":
