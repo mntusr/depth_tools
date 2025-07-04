@@ -1,4 +1,4 @@
-# The file is automatically generated from src\depth_tools\_align_depth.py; do not edit.
+# The file is automatically generated from src\depth_tools\_align_depth_univ.py; do not edit.
 import math
 from collections.abc import Sequence
 from typing import Any, SupportsIndex

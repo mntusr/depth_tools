@@ -1,4 +1,4 @@
-# The file is automatically generated from src\depth_tools\_normalize_values.py; do not edit.
+# The file is automatically generated from src\depth_tools\_normalize_values_univ.py; do not edit.
 import torch
 
 from ._diverging_functions_internal import nanmean, nanmedian

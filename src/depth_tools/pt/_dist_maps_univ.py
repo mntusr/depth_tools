@@ -1,4 +1,4 @@
-# The file is automatically generated from src\depth_tools\_dist_maps.py; do not edit.
+# The file is automatically generated from src\depth_tools\_dist_maps_univ.py; do not edit.
 from typing import Any
 
 import torch

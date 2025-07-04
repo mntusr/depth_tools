@@ -1,4 +1,4 @@
-# The file is automatically generated from src\depth_tools\_losses.py; do not edit.
+# The file is automatically generated from src\depth_tools\_losses_univ.py; do not edit.
 from typing import Protocol, Sequence, SupportsIndex
 
 import torch

@@ -32,11 +32,16 @@ def patch_file(src_path: Path) -> None:
     target_path.write_text(content)
 
 
+def get_files_to_patch(root_dir: Path) -> list[Path]:
+    return list(root_dir.glob("*_univ.py"))
+
+
 def main():
-    patch_file(Path("src/depth_tools/_losses.py"))
-    patch_file(Path("src/depth_tools/_align_depth.py"))
-    patch_file(Path("src/depth_tools/_normalize_values.py"))
-    patch_file(Path("src/depth_tools/_dist_maps.py"))
+    files_to_patch = get_files_to_patch(Path("src/depth_tools"))
+    for file_path in files_to_patch:
+        print(f"Processing {file_path}")
+        patch_file(file_path)
+    print("Done")
 
 
 if __name__ == "__main__":
