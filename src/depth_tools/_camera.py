@@ -158,9 +158,11 @@ class CameraIntrinsics:
         """
         Extract the camera parameters from a given Open GL projection matrix.
 
-        The function assumes that the coordinate system of the view space is Y-up right handed and the OpenGL camera looks at the -Z direction.
+        The function assumes that the coordinate system of the view space is **Y-up right handed** and the OpenGL camera looks at the **-Z** direction. Note that this is different from our coordinates, because we use an **Y-up left-handed** coordinate system, where the camera looks at the **+Z** direction.
 
         This function only supports the Open GL matrices that describe a projection matching to the camera model of this class.
+
+        The function assumes *column* vectors.
 
         Parameters
         ----------
@@ -182,6 +184,8 @@ class CameraIntrinsics:
             If ``P`` is not a 4x4 matrix.
 
             If the width or the height is non-positive.
+
+            If any of the focal lengths is negative.
         """
 
         if P.shape != (4, 4):
@@ -194,6 +198,16 @@ class CameraIntrinsics:
         ):
             raise ValueError(
                 f"The dtype of argument P is neither integer nor floating. Dtype: {P.dtype}"
+            )
+
+        if im_width <= 0:
+            raise ValueError(
+                f"The image width is non-positive. Image width: {im_width}"
+            )
+
+        if im_height <= 0:
+            raise ValueError(
+                f"The image height is non-positive. Image height: {im_height}"
             )
 
         zero_mask = np.array(
@@ -247,18 +261,6 @@ class CameraIntrinsics:
 
         c_x = float(total_mat[0, 2])
         c_y = float(total_mat[1, 2])
-
-        if f_x < 0:
-            LOGGER.warning(
-                f"The OpenGL projection matrix {P} corresponds to a negative x focal length ({f_x}). Setting nan as x focal length."
-            )
-            f_x = math.nan
-
-        if f_y < 0:
-            LOGGER.warning(
-                f"The OpenGL projection matrix {P} corresponds to a negative y focal length ({f_y}). Setting nan as y focal length."
-            )
-            f_y = math.nan
 
         return CameraIntrinsics(f_x=f_x, f_y=f_y, c_x=c_x, c_y=c_y)
 

@@ -52,3 +52,96 @@ class TestCamera(TestBase):
         msg = str(cm.exception)
         self.assertIn("The y focal length should be positive.", msg)
         self.assertIn("-1", msg)
+
+    def test_from_gl_proj_mat__happy_path(self) -> None:
+        P = np.array(
+            [
+                [2, 0, -3, 0],
+                [0, 4, -5, 0],
+                [0, 0, -6, 0],
+                [0, 0, -1, 0],
+            ],
+            dtype=np.float32,
+        )
+        im_width = 300
+        im_height = 400
+
+        expected_f_x = P[0, 0] * (im_width - 1) / 2
+        expected_f_y = P[1, 1] * (im_height - 1) / 2
+        expected_c_x = -P[0, 2] * (im_width - 1) / 2 + (im_width - 1) / 2
+        expected_c_y = -P[1, 2] * (im_height - 1) / 2 + (im_height - 1) / 2
+
+        cam = depth_tools.CameraIntrinsics.from_gl_proj_mat(
+            P=P, im_width=im_width, im_height=im_height
+        )
+
+        self.assertAlmostEqual(cam.f_x, expected_f_x)
+        self.assertAlmostEqual(cam.f_y, expected_f_y)
+        self.assertAlmostEqual(cam.c_x, expected_c_x)
+        self.assertAlmostEqual(cam.c_y, expected_c_y)
+
+    def test_from_gl_proj_mat__negative_fx(self) -> None:
+        P = np.array(
+            [
+                [-1, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, 1, 0],
+                [0, 0, -1, 0],
+            ],
+            dtype=np.float32,
+        )
+        with self.assertRaises(ValueError) as cm:
+            depth_tools.CameraIntrinsics.from_gl_proj_mat(
+                P=P, im_width=100, im_height=100
+            )
+        msg = str(cm.exception)
+
+        self.assertIn("The x focal length should be positive.", msg)
+
+    def test_from_gl_proj_mat__negative_fy(self) -> None:
+        P = np.array(
+            [
+                [1, 0, 0, 0],
+                [0, -1, 0, 0],
+                [0, 0, 1, 0],
+                [0, 0, -1, 0],
+            ],
+            dtype=np.float32,
+        )
+        with self.assertRaises(ValueError) as cm:
+            depth_tools.CameraIntrinsics.from_gl_proj_mat(
+                P=P, im_width=100, im_height=100
+            )
+        msg = str(cm.exception)
+
+        self.assertIn("The y focal length should be positive.", msg)
+
+    def test_from_gl_proj_mat__negative_width(self) -> None:
+        P = np.array(
+            [
+                [1, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, 1, 0],
+                [0, 0, -1, 0],
+            ],
+            dtype=np.float32,
+        )
+        with self.assertRaises(ValueError) as cm:
+            depth_tools.CameraIntrinsics.from_gl_proj_mat(
+                P=P, im_width=-100, im_height=100
+            )
+        msg = str(cm.exception)
+
+        self.assertIn("width is non-positive", msg)
+        self.assertIn("-100", msg)
+
+    def test_from_gl_proj_mat__negative_height(self) -> None:
+        P = np.eye(4, dtype=np.float32)
+        with self.assertRaises(ValueError) as cm:
+            depth_tools.CameraIntrinsics.from_gl_proj_mat(
+                P=P, im_width=100, im_height=-100
+            )
+        msg = str(cm.exception)
+
+        self.assertIn("height is non-positive", msg)
+        self.assertIn("-100", msg)
