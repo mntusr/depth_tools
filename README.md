@@ -21,6 +21,8 @@ Features:
 - Depth clip implementation
 - Limited Pytorch support (requires package Pytorch)
 - Point cloud diagram creation (requires extra `Plots`)
+- Depth/disparity/distance normalization
+- Conversion between depth maps and distance maps
 
 The contents of the extras:
 

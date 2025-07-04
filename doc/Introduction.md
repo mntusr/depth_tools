@@ -13,8 +13,10 @@ The package assumes a simple pinhole camera model. The focal length and optical 
 Main areas:
 
 - Loss calculation
+- Depth alignment and normalization
 - Point cloud creation and plotting
 - Dataset handling
+- Conversion between depth maps and distance maps
 
 # Loss calculation
 
@@ -24,9 +26,11 @@ The following losses are supported:
 - MSE loss
 - MSE loss in the log space
 
-# Depth alignment
+# Depth alignment and normalization
 
 The package can align the shift and scale of the predicted scalar maps to minimize the MSE error.
+
+The package can also normalize depth/distance/disparity maps.
 
 # Point cloud operations
 
