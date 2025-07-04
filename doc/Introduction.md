@@ -57,4 +57,4 @@ Alongside the datasets, the package also exposes a stable abstract protocol for 
 
 # Pytorch support
 
-The Pytorch-related functions are placed into a separate package. 
+The Pytorch-related functions are placed into a separate subpackage (`depth_tools.pt`). Not all Numpy-based functions have Pytorch-based implementations, but if they have, then they are mostly identical.
