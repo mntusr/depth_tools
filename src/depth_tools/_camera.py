@@ -248,6 +248,18 @@ class CameraIntrinsics:
         c_x = float(total_mat[0, 2])
         c_y = float(total_mat[1, 2])
 
+        if f_x < 0:
+            LOGGER.warning(
+                f"The OpenGL projection matrix {P} corresponds to a negative x focal length ({f_x}). Setting nan as x focal length."
+            )
+            f_x = math.nan
+
+        if f_y < 0:
+            LOGGER.warning(
+                f"The OpenGL projection matrix {P} corresponds to a negative y focal length ({f_y}). Setting nan as y focal length."
+            )
+            f_y = math.nan
+
         return CameraIntrinsics(f_x=f_x, f_y=f_y, c_x=c_x, c_y=c_y)
 
 
