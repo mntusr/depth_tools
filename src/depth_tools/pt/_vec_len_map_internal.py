@@ -37,8 +37,8 @@ def get_vec_len_map_mult_unchecked(
     x_im = torch.unsqueeze(x, dim=0).to(input_im.dtype)
     y_im = torch.unsqueeze(y, dim=0).to(input_im.dtype)
 
-    x_s = (x_im * d - cam.c_x) / cam.f_x
-    y_s = (y_im * d - cam.c_y) / cam.f_y
+    x_s = (x_im * d - cam.c_x * d) / cam.f_x
+    y_s = (y_im * d - cam.c_y * d) / cam.f_y
 
     vec_lens = torch.sqrt((x_s**2) + (y_s**2) + (d**2))
 
