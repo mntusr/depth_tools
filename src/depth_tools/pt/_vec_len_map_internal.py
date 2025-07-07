@@ -29,8 +29,8 @@ def get_vec_len_map_mult_unchecked(
         _, _, h, w = input_im.shape
 
     x, y = torch.meshgrid(
-        torch.arange(w, dtype=input_im.dtype).to(input_im),
-        torch.arange(h, dtype=input_im.dtype).to(input_im),
+        torch.arange(w, dtype=input_im.dtype),
+        torch.arange(h - 1, -1, -1).to(input_im.dtype),
         indexing="xy",  # this is the default at Numpy
     )
 

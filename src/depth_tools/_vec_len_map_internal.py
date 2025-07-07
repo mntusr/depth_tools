@@ -30,7 +30,7 @@ def get_vec_len_map_mult_unchecked(
 
     x, y = np.meshgrid(
         np.arange(w, dtype=input_im.dtype),
-        np.arange(h, dtype=input_im.dtype),
+        np.arange(h, dtype=input_im.dtype)[::-1],
         indexing="xy",  # this is the default at Numpy
     )
 

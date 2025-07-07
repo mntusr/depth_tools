@@ -41,14 +41,19 @@ class TestDistMaps(npy_unittest.NpyTestCase):
         dist_maps: np.ndarray = np.zeros_like(depth_maps)
         p_inv = pos_cam.get_intrinsic_mat_inv()
 
+        map_width = depth_maps.shape[-1]
+        map_height = depth_maps.shape[-2]
+
         for s in range(depth_maps.shape[0]):
-            for x in range(depth_maps.shape[-1]):
-                for y in range(depth_maps.shape[-2]):
-                    curr_depth = depth_maps[s, 0, y, x]
+            for x_idx in range(map_width):
+                for y_idx in range(map_height):
+                    x_p = x_idx
+                    y_p = map_height - y_idx - 1
+                    curr_depth = depth_maps[s, 0, y_idx, x_idx]
                     proj_pt = p_inv @ np.array(
                         [
-                            [x * curr_depth],
-                            [y * curr_depth],
+                            [x_p * curr_depth],
+                            [y_p * curr_depth],
                             [curr_depth],
                         ],
                         dtype=np.float32,
@@ -57,7 +62,7 @@ class TestDistMaps(npy_unittest.NpyTestCase):
                     x_space = proj_pt[0, 0]
                     y_space = proj_pt[1, 0]
                     z_space = proj_pt[2, 0]
-                    dist_maps[s, 0, y, x] = np.sqrt(
+                    dist_maps[s, 0, y_idx, x_idx] = np.sqrt(
                         x_space**2 + y_space**2 + z_space**2
                     )
 
