@@ -20,11 +20,18 @@ def dist_map_2_depth_map(
         The distance map(s). Format: ``Ims_Dist`` or ``Im_Dist``
     cam
         The camera parameters.
+    verify_args
+        If this is true, then the function verifies the arguments and raises errors if the shapes or data types are incorrect. Otherwise the possible errors are treated as implementation detail.
 
     Returns
     -------
     v
         The depth map(s). Format: ``Ims_Dist`` or ``Im_Dist`` depending on ``dist_map``
+
+    Raises
+    ------
+    ValueError
+        If ``depth_map`` does not have format ``Ims_Dist`` or ``Im_Dist``.
     """
     if verify_args:
         _verify_map_conv_args(dist_map)
@@ -46,11 +53,18 @@ def depth_map_2_dist_map(
         The depth map(s). Format: ``Ims_Depth`` or ``Im_Depth``
     cam
         The camera parameters.
+    verify_args
+        If this is true, then the function verifies the arguments and raises errors if the shapes or data types are incorrect. Otherwise the possible errors are treated as implementation detail.
 
     Returns
     -------
     v
         The distance map(s). Format: ``Ims_Dist`` or ``Im_Dist`` depending on ``depth_map``
+
+    Raises
+    ------
+    ValueError
+        If ``depth_map`` does not have format ``Ims_Dist`` or ``Im_Dist``.
     """
     if verify_args:
         _verify_map_conv_args(depth_map)
@@ -61,6 +75,12 @@ def depth_map_2_dist_map(
 
 
 def _verify_map_conv_args(map: torch.Tensor) -> None:
+    """
+    Raises
+    ------
+    ValueError
+        If ``depth_map`` does not have format ``Ims_Dist`` or ``Im_Dist``.
+    """
     if len(map.shape) not in [3, 4]:
         raise ValueError(
             f"The array containing the given map(s) should have 3 or 4 dimensions. Current shape: {map.shape}"
