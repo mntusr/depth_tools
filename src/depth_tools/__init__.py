@@ -42,4 +42,4 @@ __all__ = [
     "depth_map_2_dist_map",
 ]
 
-__version__ = "0.4.1"
+__version__ = "0.4.2"
