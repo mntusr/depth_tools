@@ -1,0 +1,6 @@
+{
+    "src/depth_tools/_losses_univ.py": {
+        "def __init__(self, n_items: int, dtype: Any = torch.float32) -> None": "def __init__(self, n_items: int, dtype: Any = torch.float32, device: torch.device = torch.device(\"cpu\")) -> None",
+        "torch.full((n_items,), torch.nan, dtype=dtype)": "torch.full((n_items,), torch.nan, dtype=dtype, device=device)"
+    }
+}

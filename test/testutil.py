@@ -1,24 +1,11 @@
 import unittest
 from typing import Callable, Iterable
 
+import npy_unittest
 import numpy as np
 
 
-class TestBase(unittest.TestCase):
-    def assertAllclose(
-        self, array1: np.ndarray, array2: np.ndarray, atol: float = 1e-4
-    ):
-        if not np.allclose(array1, array2, atol=atol):
-            raise self.failureException(
-                f"The arrays {array1} and {array2} are not close within range ({atol})."
-            )
-
-    def assertIssubdtype(self, dtype1, dtype2):
-        if not np.issubdtype(dtype1, dtype2):
-            raise self.failureException(
-                f"The dtype {dtype1} is not a subdtype of {dtype2}"
-            )
-
+class TestBase(npy_unittest.NpyTestCase):
     def probe_invalid_inputs(
         self,
         arrays: Iterable[np.ndarray],

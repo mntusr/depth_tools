@@ -9,7 +9,7 @@ from ._datasets import Dataset, Nyuv2Dataset, Sample, SimplifiedHypersimDataset
 from ._depth_clip import DepthClip
 from ._depth_map_dilation import fast_dilate_depth_map
 from ._dist_maps_univ import depth_map_2_dist_map, dist_map_2_depth_map
-from ._losses_univ import DepthLoss, dx_loss, mse_log_loss, mse_loss
+from ._losses_univ import DepthLoss, EvalBuilder, dx_loss, mse_log_loss, mse_loss
 from ._normalize_values_univ import normalize_values
 from ._point_cloud import (
     PointSubsamplingConf,
@@ -40,6 +40,7 @@ __all__ = [
     "DepthLoss",
     "dist_map_2_depth_map",
     "depth_map_2_dist_map",
+    "EvalBuilder",
 ]
 
 __version__ = "0.4.2"
