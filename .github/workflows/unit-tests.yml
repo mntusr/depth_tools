@@ -1,7 +1,11 @@
 name: "Unit tests"
 
 on:
-  - push
+  push:
+    branches:
+      - main
+      - 'feature/**'
+      - 'fix/**'
 
 permissions:
   contents: read
