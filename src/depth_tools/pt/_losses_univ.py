@@ -262,6 +262,7 @@ class EvalBuilder:
             - Any of the arrays do not have the correct format.
             - If predicted depths, the depth masks and the ground truth depths do not have the correct shape.
             - If ``first_dim_separates=Ttrue`` and the array of predicted depths has less than 2 dimensions.
+            - If too many elements are added (so the number of elements would be greater than the maximal number of elements).
         """
         if verify_args:
             self._verify_push_args(
@@ -326,7 +327,7 @@ class EvalBuilder:
             n_items_to_add = len(pred)
 
         if self._running_idx + n_items_to_add > self.n_items_total:
-            raise RuntimeError(
+            raise ValueError(
                 f"Not enough space to store the elements. Current number of elements already added: {self._running_idx}; elements to add: {n_items_to_add}; total capacity: {self._n_items_total}"
             )
 
@@ -378,7 +379,7 @@ def _verify_loss_args(
         )
     if not is_bool_array(mask):
         raise ValueError(
-            f"The mask tensor contains neither floating point, nor boolean data. Dtype: {mask.dtype}"
+            f"The mask tensor contains non-boolean data. Dtype: {mask.dtype}"
         )
     if first_dim_separates and (len(pred.shape) < 2):
         raise ValueError(

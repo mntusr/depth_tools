@@ -378,7 +378,7 @@ def _verify_loss_args(
         )
     if not is_bool_array(mask):
         raise ValueError(
-            f"The mask tensor contains neither floating point, nor boolean data. Dtype: {mask.dtype}"
+            f"The mask tensor contains non-boolean data. Dtype: {mask.dtype}"
         )
     if first_dim_separates and (len(pred.shape) < 2):
         raise ValueError(

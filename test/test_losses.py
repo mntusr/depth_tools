@@ -638,7 +638,7 @@ class TestEvalBuilder(TestBase):
             )
 
         msg = str(cm.exception)
-        self.assertIn("The mask tensor contains neither floating", msg)
+        self.assertIn("mask tensor contains non-boolean", msg)
 
     def test_push__np__gt_inconsistent_shape(self) -> None:
         with self.assertRaises(ValueError) as cm:
@@ -701,6 +701,126 @@ class TestEvalBuilder(TestBase):
                 pred=self.preds,
                 gt=self.gts,
                 mask=self.masks,
+                first_dim_separates=True,
+                verify_args=True,
+            )
+
+        msg = str(cm.exception)
+        self.assertIn("Not enough space to store the elements", msg)
+
+    def test_push__pt__invalid_shape(self) -> None:
+        with self.assertRaises(ValueError) as cm:
+            self.eval_builder_pt.push(
+                pred=torch.from_numpy(self.preds.flatten()),
+                gt=torch.from_numpy(self.gts.flatten()),
+                mask=torch.from_numpy(self.masks.flatten()),
+                first_dim_separates=True,
+                verify_args=True,
+            )
+
+        msg = str(cm.exception)
+        self.assertIn("The prediction array should be at least two dimensional", msg)
+
+    def test_push__pt__invalid_pred_dtype(self) -> None:
+        with self.assertRaises(ValueError) as cm:
+            self.eval_builder_pt.push(
+                pred=torch.from_numpy(self.preds.astype(np.int32)),
+                gt=torch.from_numpy(self.gts),
+                mask=torch.from_numpy(self.masks),
+                first_dim_separates=True,
+                verify_args=True,
+            )
+
+        msg = str(cm.exception)
+        self.assertIn("The prediction tensor does not contain floating", msg)
+
+    def test_push__pt__invalid_gt_dtype(self) -> None:
+        with self.assertRaises(ValueError) as cm:
+            self.eval_builder_pt.push(
+                pred=torch.from_numpy(self.preds),
+                gt=torch.from_numpy(self.gts.astype(np.int32)),
+                mask=torch.from_numpy(self.masks),
+                first_dim_separates=True,
+                verify_args=True,
+            )
+
+        msg = str(cm.exception)
+        self.assertIn("The ground truth tensor does not contain floating", msg)
+
+    def test_push__pt__invalid_mask_dtype(self) -> None:
+        with self.assertRaises(ValueError) as cm:
+            self.eval_builder_pt.push(
+                pred=torch.from_numpy(self.preds),
+                gt=torch.from_numpy(self.gts),
+                mask=torch.from_numpy(self.masks.astype(np.int32)),
+                first_dim_separates=True,
+                verify_args=True,
+            )
+
+        msg = str(cm.exception)
+        self.assertIn("mask tensor contains non-boolean", msg)
+
+    def test_push__pt__gt_inconsistent_shape(self) -> None:
+        with self.assertRaises(ValueError) as cm:
+            self.eval_builder_pt.push(
+                pred=torch.from_numpy(self.preds),
+                gt=torch.from_numpy(self.gts.flatten()),
+                mask=torch.from_numpy(self.masks),
+                verify_args=True,
+            )
+
+        msg = str(cm.exception)
+        self.assertIn("The shape of the ground truths", msg)
+
+    def test_push__pt__mask_inconsistent_shape(self) -> None:
+        with self.assertRaises(ValueError) as cm:
+            self.eval_builder_pt.push(
+                pred=torch.from_numpy(self.preds),
+                gt=torch.from_numpy(self.gts),
+                mask=torch.from_numpy(self.masks.flatten()),
+                verify_args=True,
+            )
+
+        msg = str(cm.exception)
+        self.assertIn("The shape of the mask", msg)
+
+    def test_push__pt__too_many_elements_nosep(self) -> None:
+        self.eval_builder_pt.push(
+            pred=torch.from_numpy(self.preds[:2]),
+            gt=torch.from_numpy(self.gts[:2]),
+            mask=torch.from_numpy(self.masks[:2]),
+            verify_args=True,
+            first_dim_separates=True,
+        )
+        self.eval_builder_pt.push(
+            pred=torch.from_numpy(self.preds[0]),
+            gt=torch.from_numpy(self.gts[0]),
+            mask=torch.from_numpy(self.masks[0]),
+            verify_args=True,
+        )
+        with self.assertRaises(ValueError) as cm:
+            self.eval_builder_pt.push(
+                pred=torch.from_numpy(self.preds[0]),
+                gt=torch.from_numpy(self.gts[0]),
+                mask=torch.from_numpy(self.masks[0]),
+                verify_args=True,
+            )
+
+        msg = str(cm.exception)
+        self.assertIn("Not enough space to store the elements", msg)
+
+    def test_push__pt__too_many_elements_sep(self) -> None:
+        self.eval_builder_pt.push(
+            pred=torch.from_numpy(self.preds[0]),
+            gt=torch.from_numpy(self.gts[0]),
+            mask=torch.from_numpy(self.masks[0]),
+            verify_args=True,
+        )
+        with self.assertRaises(ValueError) as cm:
+            self.eval_builder_pt.push(
+                pred=torch.from_numpy(self.preds),
+                gt=torch.from_numpy(self.gts),
+                mask=torch.from_numpy(self.masks),
                 first_dim_separates=True,
                 verify_args=True,
             )
