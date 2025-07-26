@@ -1,6 +1,9 @@
 import numpy as np
 
-from ._diverging_functions_internal import nanmean, nanmedian
+from ._diverging_functions_internal import (
+    masked_mean_unchecked,
+    masked_median_unchecked,
+)
 from ._format_checks_internal import is_bool_array, is_dim_sel_ok, is_floating_array
 
 
@@ -35,13 +38,12 @@ def normalize_values(
             values=values, mask=mask, first_dim_separates=first_dim_separates
         )
 
-    values = values.copy()
+    values_median = masked_median_unchecked(
+        values, mask=mask, along_all_dims_except_0=first_dim_separates
+    )
 
-    values[~mask] = np.nan
-    values_median = nanmedian(values, along_all_dims_except_0=first_dim_separates)
-
-    normalized_pred = (values - values_median) / nanmean(
-        (values - values_median), along_all_dims_except_0=first_dim_separates
+    normalized_pred = (values - values_median) / masked_mean_unchecked(
+        (values - values_median), mask=mask, along_all_dims_except_0=first_dim_separates
     )
     normalized_pred[~mask] = 0
 

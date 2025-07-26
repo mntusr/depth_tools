@@ -3,14 +3,20 @@ from typing import Any
 import torch
 
 
-def nanmedian(a: torch.Tensor, along_all_dims_except_0: bool) -> torch.Tensor:
+def masked_median_unchecked(
+    a: torch.Tensor, mask: torch.Tensor, along_all_dims_except_0: bool
+) -> torch.Tensor:
     """
-    A nanmedian function that works similarly for both Numpy and Pytorch.
+    A function that calculates the median for the array elements selected by a given mask.
+
+    This function does not check its arguments.
 
     Parameters
     ----------
     a
-        The array on which the nanmedian calculation should be done.
+        The array on which the median calculation should be done. Format: any floating point array
+    mask
+        The array that selects the elements used to calculate the median. Format: its shape is the same as the shape of ``a``, its dtype is bool
     along_all_dims_except_0
         If true, then the median calculation is done along all dimensions, except 0. Otherwise, the median calculation is done alongside all dimensions.
 
@@ -19,6 +25,10 @@ def nanmedian(a: torch.Tensor, along_all_dims_except_0: bool) -> torch.Tensor:
     v
         The calculated median.
     """
+
+    a = a.clone()
+    a[~mask] = torch.nan
+
     if along_all_dims_except_0:
         a_reshaped = a.reshape(len(a), -1)
         nanmedian_values = torch.nanmedian(a_reshaped, dim=1).values
@@ -28,14 +38,20 @@ def nanmedian(a: torch.Tensor, along_all_dims_except_0: bool) -> torch.Tensor:
         return torch.nanmedian(a)
 
 
-def nanmean(a: torch.Tensor, along_all_dims_except_0: bool) -> torch.Tensor:
+def masked_mean_unchecked(
+    a: torch.Tensor, mask: torch.Tensor, along_all_dims_except_0: bool
+) -> torch.Tensor:
     """
-    A nanmean function that works similarly for both Numpy and Pytorch
+    A function that calculates the mean for the array elements selected by a given mask.
+
+    This function does not check its arguments.
 
     Parameters
     ----------
     a
-        The array on which the nanmedian calculation should be done.
+        The array on which the mean calculation should be done. Format: any floating point array
+    mask
+        The array that selects the elements used to calculate the median. Format: its shape is the same as the shape of ``a``, its dtype is bool
     along_all_dims_except_0
         If true, then the mean calculation is done along all dimensions, except 0. Otherwise, the mean calculation is done alongside all dimensions.
 
@@ -44,6 +60,10 @@ def nanmean(a: torch.Tensor, along_all_dims_except_0: bool) -> torch.Tensor:
     v
         The calculated median.
     """
+
+    a = a.clone()
+    a[~mask] = torch.nan
+
     if along_all_dims_except_0:
         a_reshaped = a.reshape(len(a), -1)
         nanmean_values = torch.nanmean(a_reshaped, dim=1)

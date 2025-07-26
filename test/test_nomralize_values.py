@@ -137,26 +137,51 @@ class TestNormalizeValues(npy_unittest.NpyTestCase):
         self.assertIn(str(self.original_values.size), msg)
 
     def test_normalize_values__happy_path__multiple_pt(self):
+        values = torch.from_numpy(self.original_values).requires_grad_(True)
+
         actual_normalized_values = depth_tools.pt.normalize_values(
-            values=torch.from_numpy(self.original_values),
+            values=values,
             mask=torch.from_numpy(self.mask),
             verify_args=True,
             first_dim_separates=True,
-        ).numpy()
+        )
 
-        self.assertAllclose(self.expected_normalized_values, actual_normalized_values)
+        self.assertAllclose(
+            self.expected_normalized_values, actual_normalized_values.detach().numpy()
+        )
+
+        actual_normalized_values.mean().backward()
+
+        # normalize_values internally uses nan to represent non-selected values,
+        # so we have to be extra sure that these nans do not leak into the gradients
+        grad = values.grad
+        assert grad is not None
+        grad_has_nan = torch.any(torch.isnan(grad))
+        self.assertFalse(grad_has_nan)
 
     def test_normalize_values__happy_path__single_pt(self):
+        values = torch.from_numpy(self.original_values[0]).requires_grad_(True)
         actual_normalized_values = depth_tools.pt.normalize_values(
-            values=torch.from_numpy(self.original_values[0]),
+            values=values,
             mask=torch.from_numpy(self.mask[0]),
             verify_args=True,
             first_dim_separates=True,
-        ).numpy()
+        )
 
         self.assertAllclose(
-            self.expected_normalized_values[0], actual_normalized_values, atol=1e-4
+            self.expected_normalized_values[0],
+            actual_normalized_values.detach().numpy(),
+            atol=1e-4,
         )
+
+        actual_normalized_values.mean().backward()
+
+        # normalize_values internally uses nan to represent non-selected values,
+        # so we have to be extra sure that these nans do not leak into the gradients
+        grad = values.grad
+        assert grad is not None
+        grad_has_nan = torch.any(torch.isnan(grad))
+        self.assertFalse(grad_has_nan)
 
     def test_normalize_values__single_value_pt(self):
         with self.assertRaises(ValueError) as cm:
