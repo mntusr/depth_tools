@@ -42,5 +42,6 @@ __all__ = [
     "depth_map_2_dist_map",
     "EvalBuilder",
 ]
+from ._object_insertion import depth_px_and_model_coords_2_mvm
 
 __version__ = "0.4.4"
