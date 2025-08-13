@@ -45,4 +45,4 @@ __all__ = [
     "depth_px_and_model_coords_2_mvm",
 ]
 
-__version__ = "0.4.4"
+__version__ = "0.5.0"
