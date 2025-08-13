@@ -11,6 +11,7 @@ from ._depth_map_dilation import fast_dilate_depth_map
 from ._dist_maps_univ import depth_map_2_dist_map, dist_map_2_depth_map
 from ._losses_univ import DepthLoss, EvalBuilder, dx_loss, mse_log_loss, mse_loss
 from ._normalize_values_univ import normalize_values
+from ._object_insertion import depth_px_and_model_coords_2_mvm
 from ._point_cloud import (
     PointSubsamplingConf,
     depth_2_point_cloud,
@@ -41,7 +42,7 @@ __all__ = [
     "dist_map_2_depth_map",
     "depth_map_2_dist_map",
     "EvalBuilder",
+    "depth_px_and_model_coords_2_mvm",
 ]
-from ._object_insertion import depth_px_and_model_coords_2_mvm
 
 __version__ = "0.4.4"
