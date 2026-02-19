@@ -52,7 +52,7 @@ def dx_loss(
     Return
     ------
     v
-        The final losses. Format: ``Scalars``
+        The final losses. Format: ``Scalars`` if ``first_dim_separates``, otherwise a zero-dimensional array with the loss value for the inputs.
     """
     if verify_args:
         _verify_loss_args(
@@ -68,9 +68,6 @@ def dx_loss(
     masked_mean = masked_mean_unchecked(
         a=loss_vals, mask=mask, along_all_dims_except_0=first_dim_separates
     )
-
-    if not first_dim_separates:
-        masked_mean = np.expand_dims(masked_mean, axis=0)
 
     return masked_mean
 
@@ -106,7 +103,7 @@ def mse_loss(
     Return
     ------
     v
-        The final losses. Format: ``Scalars``
+        The final losses. Format: ``Scalars`` if ``first_dim_separates``, otherwise a zero-dimensional array with the loss value for the inputs.
     """
     if verify_args:
         _verify_loss_args(
@@ -118,9 +115,6 @@ def mse_loss(
     masked_mean = masked_mean_unchecked(
         a=x, mask=mask, along_all_dims_except_0=first_dim_separates
     )
-
-    if not first_dim_separates:
-        masked_mean = np.expand_dims(masked_mean, axis=0)
 
     return masked_mean
 
@@ -155,7 +149,7 @@ def mse_log_loss(
     Return
     ------
     v
-        The final losses. Format: ``Scalars_Float``
+        The final losses. Format: ``Scalars`` if ``first_dim_separates``, otherwise a zero-dimensional array with the loss value for the inputs.
     """
     if verify_args:
         _verify_loss_args(
@@ -166,9 +160,6 @@ def mse_log_loss(
     masked_mean = masked_mean_unchecked(
         a=x, mask=mask, along_all_dims_except_0=first_dim_separates
     )
-
-    if not first_dim_separates:
-        masked_mean = np.expand_dims(masked_mean, axis=0)
 
     return masked_mean
 

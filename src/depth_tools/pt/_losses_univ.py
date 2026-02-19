@@ -53,7 +53,7 @@ def dx_loss(
     Return
     ------
     v
-        The final losses. Format: ``Scalars``
+        The final losses. Format: ``Scalars`` if ``first_dim_separates``, otherwise a zero-dimensional array with the loss value for the inputs.
     """
     if verify_args:
         _verify_loss_args(
@@ -66,11 +66,11 @@ def dx_loss(
     loss_vals: torch.Tensor = deltas < (1.25**x)
     loss_vals = loss_vals.to(pred.dtype)
 
-    return masked_mean_unchecked(
-        a=loss_vals,
-        mask=mask,
-        along_all_dims_except_0=first_dim_separates,
+    masked_mean = masked_mean_unchecked(
+        a=loss_vals, mask=mask, along_all_dims_except_0=first_dim_separates
     )
+
+    return masked_mean
 
 
 def mse_loss(
@@ -104,7 +104,7 @@ def mse_loss(
     Return
     ------
     v
-        The final losses. Format: ``Scalars``
+        The final losses. Format: ``Scalars`` if ``first_dim_separates``, otherwise a zero-dimensional array with the loss value for the inputs.
     """
     if verify_args:
         _verify_loss_args(
@@ -113,9 +113,11 @@ def mse_loss(
 
     x = (pred - gt) ** 2
 
-    return masked_mean_unchecked(
+    masked_mean = masked_mean_unchecked(
         a=x, mask=mask, along_all_dims_except_0=first_dim_separates
     )
+
+    return masked_mean
 
 
 def mse_log_loss(
@@ -148,7 +150,7 @@ def mse_log_loss(
     Return
     ------
     v
-        The final losses. Format: ``Scalars_Float``
+        The final losses. Format: ``Scalars`` if ``first_dim_separates``, otherwise a zero-dimensional array with the loss value for the inputs.
     """
     if verify_args:
         _verify_loss_args(
@@ -156,9 +158,11 @@ def mse_log_loss(
         )
     x = (torch.log(pred) - torch.log(gt)) ** 2
 
-    return masked_mean_unchecked(
+    masked_mean = masked_mean_unchecked(
         a=x, mask=mask, along_all_dims_except_0=first_dim_separates
     )
+
+    return masked_mean
 
 
 class EvalBuilder:

@@ -177,8 +177,8 @@ class TestLosses(TestBase):
         )
         self.assertAllclose(actual_d001_losses, self.expected_d001_losses[0])
         self.assertAllclose(actual_d100_losses, self.expected_d100_losses[0])
-        self.assertEqual(len(actual_d001_losses.shape), 1)
-        self.assertEqual(len(actual_d100_losses.shape), 1)
+        self.assertEqual(len(actual_d001_losses.shape), 0)
+        self.assertEqual(len(actual_d100_losses.shape), 0)
 
     def test_dx_loss__pt__happy_path(self) -> None:
         with torch.no_grad():
@@ -234,7 +234,7 @@ class TestLosses(TestBase):
             pred=self.pred[0], gt=self.gt[0], mask=self.mask[0]
         )
         self.assertAllclose(actual_mse_losses, self.expected_mse_losses[0])
-        self.assertEqual(len(actual_mse_losses.shape), 1)
+        self.assertEqual(len(actual_mse_losses.shape), 0)
 
     def test_mse_loss__pt__happy_path(self):
         with torch.no_grad():
