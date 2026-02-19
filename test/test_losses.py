@@ -135,6 +135,8 @@ class TestLosses(TestBase):
         )
         self.assertAllclose(actual_d001_losses, self.expected_d001_losses)
         self.assertAllclose(actual_d100_losses, self.expected_d100_losses)
+        self.assertEqual(len(actual_d001_losses.shape), 1)
+        self.assertEqual(len(actual_d100_losses.shape), 1)
 
     def test_dx_loss__np__not_enough_dimensions(self) -> None:
         with self.assertRaises(ValueError) as cm:
@@ -175,6 +177,8 @@ class TestLosses(TestBase):
         )
         self.assertAllclose(actual_d001_losses, self.expected_d001_losses[0])
         self.assertAllclose(actual_d100_losses, self.expected_d100_losses[0])
+        self.assertEqual(len(actual_d001_losses.shape), 1)
+        self.assertEqual(len(actual_d100_losses.shape), 1)
 
     def test_dx_loss__pt__happy_path(self) -> None:
         with torch.no_grad():
@@ -197,6 +201,8 @@ class TestLosses(TestBase):
 
         self.assertAllclose(actual_d001_losses, self.expected_d001_losses)
         self.assertAllclose(actual_d100_losses, self.expected_d100_losses)
+        self.assertEqual(len(actual_d001_losses.shape), 1)
+        self.assertEqual(len(actual_d100_losses.shape), 1)
 
     def test_dx_loss__np__invalid_arrays(self):
         def fn(pred, gt, mask):
@@ -221,12 +227,14 @@ class TestLosses(TestBase):
             pred=self.pred, gt=self.gt, mask=self.mask, first_dim_separates=True
         )
         self.assertAllclose(actual_mse_losses, self.expected_mse_losses)
+        self.assertEqual(len(actual_mse_losses.shape), 1)
 
     def test_mse_loss__np__happy_path__single_value(self):
         actual_mse_losses = depth_tools.mse_loss(
             pred=self.pred[0], gt=self.gt[0], mask=self.mask[0]
         )
         self.assertAllclose(actual_mse_losses, self.expected_mse_losses[0])
+        self.assertEqual(len(actual_mse_losses.shape), 1)
 
     def test_mse_loss__pt__happy_path(self):
         with torch.no_grad():
@@ -238,6 +246,7 @@ class TestLosses(TestBase):
                 verify_args=True,
             ).numpy()
         self.assertAllclose(actual_mse_losses, self.expected_mse_losses)
+        self.assertEqual(len(actual_mse_losses.shape), 1)
 
     def test_mse_loss__np__not_enough_dimensions(self) -> None:
         with self.assertRaises(ValueError) as cm:
@@ -291,6 +300,7 @@ class TestLosses(TestBase):
             pred=self.pred, gt=self.gt, mask=self.mask, first_dim_separates=True
         )
         self.assertAllclose(actual_mse_log_losses, self.expected_mse_log_losses)
+        self.assertEqual(len(actual_mse_log_losses.shape), 1)
 
     def test_mse_log_loss__pt__happy_path(self):
         with torch.no_grad():
@@ -302,6 +312,7 @@ class TestLosses(TestBase):
                 verify_args=True,
             ).numpy()
         self.assertAllclose(actual_mse_log_losses, self.expected_mse_log_losses)
+        self.assertEqual(len(actual_mse_log_losses.shape), 1)
 
     def test_mse_log_loss__np__not_enough_dimensions(self) -> None:
         with self.assertRaises(ValueError) as cm:
@@ -348,72 +359,6 @@ class TestLosses(TestBase):
                 )
 
         self.probe_invalid_inputs([self.pred, self.gt, self.mask], fn)
-
-    def test_calculate_masked_mean__np__nosep(self):
-        arr = np.full((30, 40), 0.1, dtype=np.float32)
-        mask = np.full((30, 40), True, dtype=np.bool_)
-
-        arr[:, 1] = 10000
-        mask[:, 1] = False
-
-        actual_mean = cast(
-            float,
-            depth_tools._losses_univ._calculate_masked_mean_unchecked(
-                values=arr, mask=mask, first_dim_separates=False
-            ).item(),
-        )
-        expected_mean = 0.1
-
-        self.assertAlmostEqual(actual_mean, expected_mean)
-
-    def test_calculate_masked_mean__np__sep(self):
-        arr = np.full((30, 40), 0.1, dtype=np.float32)
-        mask = np.full((30, 40), True, dtype=np.bool_)
-
-        arr[:, 1] = 10000
-        mask[:, 1] = False
-
-        actual_mean = depth_tools._losses_univ._calculate_masked_mean_unchecked(
-            values=arr, mask=mask, first_dim_separates=True
-        )
-        expected_mean = np.full((30), 0.1, dtype=np.float32)
-
-        self.assertAllclose(actual_mean, expected_mean)
-
-    def test_calculate_masked_mean__pt__nosep(self):
-        arr = np.full((30, 40), 0.1, dtype=np.float32)
-        mask = np.full((30, 40), True, dtype=np.bool_)
-
-        arr[:, 1] = 10000
-        mask[:, 1] = False
-
-        actual_mean = cast(
-            float,
-            depth_tools.pt._losses_univ._calculate_masked_mean_unchecked(
-                values=torch.from_numpy(arr),
-                mask=torch.from_numpy(mask),
-                first_dim_separates=False,
-            ).item(),
-        )
-        expected_mean = 0.1
-
-        self.assertAlmostEqual(actual_mean, expected_mean)
-
-    def test_calculate_masked_mean__pt__sep(self):
-        arr = np.full((30, 40), 0.1, dtype=np.float32)
-        mask = np.full((30, 40), True, dtype=np.bool_)
-
-        arr[:, 1] = 10000
-        mask[:, 1] = False
-
-        actual_mean = depth_tools.pt._losses_univ._calculate_masked_mean_unchecked(
-            values=torch.from_numpy(arr),
-            mask=torch.from_numpy(mask),
-            first_dim_separates=True,
-        ).numpy()
-        expected_mean = np.full((30), 0.1, dtype=np.float32)
-
-        self.assertAllclose(actual_mean, expected_mean)
 
 
 class TestEvalBuilder(TestBase):

@@ -3,6 +3,7 @@ from typing import Any, Protocol
 
 import torch
 
+from ._diverging_functions_internal import masked_mean_unchecked
 from ._format_checks_internal import is_bool_array, is_floating_array
 
 
@@ -65,8 +66,10 @@ def dx_loss(
     loss_vals: torch.Tensor = deltas < (1.25**x)
     loss_vals = loss_vals.to(pred.dtype)
 
-    return _calculate_masked_mean_unchecked(
-        values=loss_vals, mask=mask, first_dim_separates=first_dim_separates
+    return masked_mean_unchecked(
+        a=loss_vals,
+        mask=mask,
+        along_all_dims_except_0=first_dim_separates,
     )
 
 
@@ -110,8 +113,8 @@ def mse_loss(
 
     x = (pred - gt) ** 2
 
-    return _calculate_masked_mean_unchecked(
-        values=x, mask=mask, first_dim_separates=first_dim_separates
+    return masked_mean_unchecked(
+        a=x, mask=mask, along_all_dims_except_0=first_dim_separates
     )
 
 
@@ -153,8 +156,8 @@ def mse_log_loss(
         )
     x = (torch.log(pred) - torch.log(gt)) ** 2
 
-    return _calculate_masked_mean_unchecked(
-        values=x, mask=mask, first_dim_separates=first_dim_separates
+    return masked_mean_unchecked(
+        a=x, mask=mask, along_all_dims_except_0=first_dim_separates
     )
 
 
@@ -385,34 +388,3 @@ def _verify_loss_args(
         raise ValueError(
             f"The prediction array should be at least two dimensional if the first dimension separates the samples. The current shape of the prediction array: {tuple(pred.shape)}"
         )
-
-
-def _calculate_masked_mean_unchecked(
-    values: torch.Tensor,
-    mask: torch.Tensor,
-    first_dim_separates: bool = False,
-) -> torch.Tensor:
-    """
-    A function that calculates the masked mean of the given values.
-
-    This function does not check its arguments.
-
-    Parameters
-    ----------
-    values
-        The values of which the mean should be calculated. Format: the array should contain floating data. If ``first_dim_separates``, then it should have at least two dimensions. It should have the same shape as the predicted values.
-    mask
-        The masks that select the relevant values. Format: the array should contain boolean data. If ``first_dim_separates``, then it should have at least two dimensions. It should have the same shape as the predicted values.
-    first_dim_separates
-        If this is true, then the mean calculation is done for each element along dimension 0 individually. Otherwise the claculation is done for the whole array globally.
-    """
-
-    if first_dim_separates:
-        dim = tuple(range(1, len(values.shape)))
-    else:
-        dim = None
-
-    values = values * mask
-    return values.mean(dim=dim) * (
-        torch.ones_like(values).sum(dim=dim) / mask.to(values.dtype).sum(dim=dim)
-    )

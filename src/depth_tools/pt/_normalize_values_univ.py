@@ -40,11 +40,17 @@ def normalize_values(
         )
 
     values_median = masked_median_unchecked(
-        values, mask=mask, along_all_dims_except_0=first_dim_separates
+        values,
+        mask=mask,
+        along_all_dims_except_0=first_dim_separates,
+        keep_dropped_dims=True,
     )
 
     normalized_pred = (values - values_median) / masked_mean_unchecked(
-        (values - values_median), mask=mask, along_all_dims_except_0=first_dim_separates
+        (values - values_median),
+        mask=mask,
+        along_all_dims_except_0=first_dim_separates,
+        keep_dropped_dims=True,
     )
     normalized_pred[~mask] = 0
 
