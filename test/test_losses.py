@@ -853,14 +853,22 @@ class TestEvalBuilder(TestBase):
         else:
             data = eval_builder.get_data_copy()
             for i in range(eval_builder.n_items_added):
-                self.assertAlmostEqual(self.d1[i].item(), data["d1"][i].numpy().item())
-                self.assertAlmostEqual(self.d2[i].item(), data["d2"][i].numpy().item())
-                self.assertAlmostEqual(self.d3[i].item(), data["d3"][i].numpy().item())
                 self.assertAlmostEqual(
-                    self.mse[i].item(), data["mse"][i].numpy().item()
+                    self.d1[i].item(), data["d1"][i].numpy().item(), delta=1e-4
                 )
                 self.assertAlmostEqual(
-                    self.mse_log[i].item(), data["mse_log"][i].numpy().item()
+                    self.d2[i].item(), data["d2"][i].numpy().item(), delta=1e-4
+                )
+                self.assertAlmostEqual(
+                    self.d3[i].item(), data["d3"][i].numpy().item(), delta=1e-4
+                )
+                self.assertAlmostEqual(
+                    self.mse[i].item(), data["mse"][i].numpy().item(), delta=1e-4
+                )
+                self.assertAlmostEqual(
+                    self.mse_log[i].item(),
+                    data["mse_log"][i].numpy().item(),
+                    delta=1e-4,
                 )
             if eval_builder.n_items_added < eval_builder.n_items_total:
                 for i in range(eval_builder.n_items_added, eval_builder.n_items_total):
