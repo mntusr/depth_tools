@@ -2,7 +2,7 @@ from typing import Any, Protocol
 
 import numpy as np
 
-from ._diverging_functions_internal import masked_mean_unchecked
+from ._diverging_functions_internal import masked_mean_unchecked, new_zeros
 from ._format_checks_internal import is_bool_array, is_floating_array
 
 
@@ -155,13 +155,38 @@ def mse_log_loss(
         _verify_loss_args(
             gt=gt, pred=pred, mask=mask, first_dim_separates=first_dim_separates
         )
-    x = (np.log(pred) - np.log(gt)) ** 2
+    x = (
+        _masked_log_unchecked(x=pred, mask=mask)
+        - _masked_log_unchecked(x=gt, mask=mask)
+    ) ** 2
 
     masked_mean = masked_mean_unchecked(
         a=x, mask=mask, along_all_dims_except_0=first_dim_separates
     )
 
     return masked_mean
+
+
+def _masked_log_unchecked(x: np.ndarray, mask: np.ndarray) -> np.ndarray:
+    """
+    Calculates the elementwise logarithm at the elements selected by the mask. The other elements are set to 0.
+
+    Parameters
+    ----------
+    x
+        The array. Format: any array. Format: shape: any, dtype: floating point
+    mask
+        The mask that selects the valid elements of the array. Format: dtype: boolean, shape: same as the shape of ``x``, values: ``True`` for the selected elements, ``False`` for the other elements
+
+    Returns
+    -------
+    v
+        The result of the log calculation. Format: shape, dtype: same as the shape and dtype of ``x``
+    """
+    x_new = new_zeros(x)
+
+    x_new[mask] = np.log(x[mask])
+    return x_new
 
 
 class EvalBuilder:

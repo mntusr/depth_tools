@@ -154,3 +154,25 @@ def new_full(
         real_shape = shape
 
     return like.new_full(real_shape, value)
+
+
+def new_zeros(
+    like: torch.Tensor,
+    shape: tuple[int, ...] | None = None,
+) -> torch.Tensor:
+    """
+    Implements a ``zeros_like`` operation that plays nicely with tensor subclassing in Pytorch.
+
+    Parameters
+    ----------
+    like
+        The original array. Format: any array.
+    shape
+        The shape of the created array.
+    """
+    if shape is None:
+        real_shape = like.shape
+    else:
+        real_shape = shape
+
+    return like.new_zeros(size=real_shape, dtype=like.dtype)

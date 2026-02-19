@@ -1,3 +1,4 @@
+import logging
 import math
 from typing import cast
 
@@ -301,6 +302,16 @@ class TestLosses(TestBase):
         )
         self.assertAllclose(actual_mse_log_losses, self.expected_mse_log_losses)
         self.assertEqual(len(actual_mse_log_losses.shape), 1)
+
+    def test_mse_log_loss__np__no_warning(self):
+        pred = np.array([1, 2, 0], dtype=np.float32)
+        gt = np.array([1, 5, 0], dtype=np.float32)
+        mask = np.array([True, True, False], dtype=np.bool)
+
+        with self.assertNoLogs(level=logging.WARNING):
+            depth_tools.mse_log_loss(
+                pred=pred, gt=gt, mask=mask, first_dim_separates=False
+            )
 
     def test_mse_log_loss__pt__happy_path(self):
         with torch.no_grad():

@@ -137,3 +137,22 @@ def new_full(
         The shape of the created array.
     """
     return np.full_like(like, value, shape=shape)
+
+
+def new_zeros(
+    like: np.ndarray,
+    shape: tuple[int, ...] | None = None,
+) -> np.ndarray:
+    """
+    Implements a ``zeros_like`` operation that plays nicely with tensor subclassing in Pytorch.
+
+    Parameters
+    ----------
+    like
+        The original array. Format: any array.
+    value
+        The value.
+    shape
+        The shape of the created array.
+    """
+    return np.zeros_like(like, shape=shape)
