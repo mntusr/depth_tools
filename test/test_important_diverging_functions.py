@@ -16,6 +16,7 @@ class TestImportantDivergingFunctions(NpyTestCase):
                 [3, 5, 1],
                 [0, 4, 2],
                 [3, np.nan, 7],
+                [np.inf, np.inf, 3],
             ],
             dtype=np.float32,
         )
@@ -39,11 +40,12 @@ class TestImportantDivergingFunctions(NpyTestCase):
                 [3, 5, 1],
                 [0, 4, 2],
                 [3, np.nan, 7],
+                [np.inf, np.inf, 3],
             ],
             dtype=np.float32,
         )
         im = np.expand_dims(im, 0)
-        im[:, -1, -1] = np.nan
+        im[-1, -1, -1] = np.nan
 
         mask = np.ones_like(im, dtype=np.bool)
         mask[:, 2, 1] = False
@@ -113,7 +115,8 @@ class TestImportantDivergingFunctions(NpyTestCase):
             ],
             dtype=np.float32,
         )
-        im = np.stack([im, 2 * im])
+        im = np.stack([im, 2 * im, 3 * im])
+        im[2] = np.inf
 
         mask = np.ones_like(im, dtype=np.bool)
         mask[:, 2, 1] = False
@@ -125,10 +128,14 @@ class TestImportantDivergingFunctions(NpyTestCase):
             [
                 im[0].mean(where=mask[0]),
                 im[1].mean(where=mask[1]),
+                im[2].mean(where=mask[2]),
             ]
         )
         self.assertArrayEqual(
-            np.isnan(expected_mean), np.array([False, False])
+            np.isnan(expected_mean), np.array([False, False, False])
+        )  # self test
+        self.assertArrayEqual(
+            np.isinf(expected_mean), np.array([False, False, True])
         )  # self test
 
         self.assertAllclose(actual_mean, expected_mean)
@@ -143,8 +150,9 @@ class TestImportantDivergingFunctions(NpyTestCase):
             ],
             dtype=np.float32,
         )
-        im = np.stack([im, 2 * im])
-        im[-1, -1, -1] = np.nan
+        im = np.stack([im, 2 * im, 3 * im])
+        im[1, -1, -1] = np.nan
+        im[2] = np.inf
 
         mask = np.ones_like(im, dtype=np.bool)
         mask[:, 2, 1] = False
@@ -156,10 +164,14 @@ class TestImportantDivergingFunctions(NpyTestCase):
             [
                 im[0].mean(where=mask[0]),
                 im[1].mean(where=mask[1]),
+                im[2].mean(where=mask[2]),
             ]
         )
         self.assertArrayEqual(
-            np.isnan(expected_mean), np.array([False, True])
+            np.isnan(expected_mean), np.array([False, True, False])
+        )  # self test
+        self.assertArrayEqual(
+            np.isinf(expected_mean), np.array([False, False, True])
         )  # self test
 
         self.assertAllclose(actual_mean, expected_mean, equal_nan=True)
@@ -174,7 +186,8 @@ class TestImportantDivergingFunctions(NpyTestCase):
             ],
             dtype=np.float32,
         )
-        im = np.stack([im, 2 * im])
+        im = np.stack([im, 2 * im, 3 * im])
+        im[2] = np.inf
 
         mask = np.ones_like(im, dtype=np.bool)
         mask[:, 2, 1] = False
@@ -186,12 +199,17 @@ class TestImportantDivergingFunctions(NpyTestCase):
             [
                 im[0].mean(where=mask[0]),
                 im[1].mean(where=mask[1]),
+                im[2].mean(where=mask[2]),
             ]
         )
         expected_mean = np.expand_dims(np.expand_dims(expected_mean, -1), -1)
         self.assertArrayEqual(
             np.isnan(expected_mean).reshape(len(expected_mean)),
-            np.array([False, False]),
+            np.array([False, False, False]),
+        )  # self test
+        self.assertArrayEqual(
+            np.isinf(expected_mean).reshape(len(expected_mean)),
+            np.array([False, False, True]),
         )  # self test
 
         self.assertAllclose(actual_mean, expected_mean, equal_nan=True)
@@ -206,8 +224,9 @@ class TestImportantDivergingFunctions(NpyTestCase):
             ],
             dtype=np.float32,
         )
-        im = np.stack([im, 2 * im])
-        im[-1, -1, -1] = np.nan
+        im = np.stack([im, 2 * im, 3 * im])
+        im[1, -1, -1] = np.nan
+        im[2] = np.inf
 
         mask = np.ones_like(im, dtype=np.bool)
         mask[:, 2, 1] = False
@@ -219,10 +238,14 @@ class TestImportantDivergingFunctions(NpyTestCase):
             [
                 im[0].mean(where=mask[0]),
                 im[1].mean(where=mask[1]),
+                im[2].mean(where=mask[2]),
             ]
         )
         self.assertArrayEqual(
-            np.isnan(expected_mean), np.array([False, True])
+            np.isnan(expected_mean), np.array([False, True, False])
+        )  # self test
+        self.assertArrayEqual(
+            np.isinf(expected_mean), np.array([False, False, True])
         )  # self test
         expected_mean = np.expand_dims(np.expand_dims(expected_mean, -1), -1)
 
@@ -364,7 +387,8 @@ class TestImportantDivergingFunctions(NpyTestCase):
             ],
             dtype=np.float32,
         )
-        im = np.stack([im, 2 * im])
+        im = np.stack([im, 2 * im, 3 * im])
+        im[2] = np.inf
         im_tensor = torch.tensor(im, requires_grad=True)
 
         mask = np.ones_like(im, dtype=np.bool)
@@ -382,10 +406,14 @@ class TestImportantDivergingFunctions(NpyTestCase):
             [
                 im[0].mean(where=mask[0]),
                 im[1].mean(where=mask[1]),
+                im[2].mean(where=mask[2]),
             ]
         )
         self.assertArrayEqual(
-            np.isnan(expected_mean), np.array([False, False])
+            np.isnan(expected_mean), np.array([False, False, False])
+        )  # self test
+        self.assertArrayEqual(
+            np.isinf(expected_mean), np.array([False, False, True])
         )  # self test
 
         self.assertAllclose(np.array(actual_mean.detach()), expected_mean)
@@ -401,8 +429,9 @@ class TestImportantDivergingFunctions(NpyTestCase):
             ],
             dtype=np.float32,
         )
-        im = np.stack([im, 2 * im])
-        im[-1, -1, -1] = np.nan
+        im = np.stack([im, 2 * im, 3 * im])
+        im[1, -1, -1] = np.nan
+        im[2] = np.inf
         im_tensor = torch.tensor(im, requires_grad=True)
 
         mask = np.ones_like(im, dtype=np.bool)
@@ -420,10 +449,14 @@ class TestImportantDivergingFunctions(NpyTestCase):
             [
                 im[0].mean(where=mask[0]),
                 im[1].mean(where=mask[1]),
+                im[2].mean(where=mask[2]),
             ]
         )
         self.assertArrayEqual(
-            np.isnan(expected_mean), np.array([False, True])
+            np.isnan(expected_mean), np.array([False, True, False])
+        )  # self test
+        self.assertArrayEqual(
+            np.isinf(expected_mean), np.array([False, False, True])
         )  # self test
 
         self.assertAllclose(
@@ -441,7 +474,8 @@ class TestImportantDivergingFunctions(NpyTestCase):
             ],
             dtype=np.float32,
         )
-        im = np.stack([im, 2 * im])
+        im = np.stack([im, 2 * im, 3 * im])
+        im[2] = np.inf
         im_tensor = torch.tensor(im, requires_grad=True)
 
         mask = np.ones_like(im, dtype=np.bool)
@@ -459,10 +493,14 @@ class TestImportantDivergingFunctions(NpyTestCase):
             [
                 im[0].mean(where=mask[0]),
                 im[1].mean(where=mask[1]),
+                im[2].mean(where=mask[2]),
             ]
         )
         self.assertArrayEqual(
-            np.isnan(expected_mean), np.array([False, False])
+            np.isnan(expected_mean), np.array([False, False, False])
+        )  # self test
+        self.assertArrayEqual(
+            np.isinf(expected_mean), np.array([False, False, True])
         )  # self test
         expected_mean = np.expand_dims(np.expand_dims(expected_mean, -1), -1)
 
@@ -479,8 +517,9 @@ class TestImportantDivergingFunctions(NpyTestCase):
             ],
             dtype=np.float32,
         )
-        im = np.stack([im, 2 * im])
-        im[-1, -1, -1] = np.nan
+        im = np.stack([im, 2 * im, 3 * im])
+        im[2] = np.inf
+        im[1, -1, -1] = np.nan
         im_tensor = torch.tensor(im, requires_grad=True)
 
         mask = np.ones_like(im, dtype=np.bool)
@@ -498,10 +537,14 @@ class TestImportantDivergingFunctions(NpyTestCase):
             [
                 im[0].mean(where=mask[0]),
                 im[1].mean(where=mask[1]),
+                im[2].mean(where=mask[2]),
             ]
         )
         self.assertArrayEqual(
-            np.isnan(expected_mean), np.array([False, True])
+            np.isnan(expected_mean), np.array([False, True, False])
+        )  # self test
+        self.assertArrayEqual(
+            np.isinf(expected_mean), np.array([False, False, True])
         )  # self test
         expected_mean = np.expand_dims(np.expand_dims(expected_mean, -1), -1)
 
@@ -623,7 +666,8 @@ class TestImportantDivergingFunctions(NpyTestCase):
             ],
             dtype=np.float32,
         )
-        im = np.stack([im, 2 * im])
+        im = np.stack([im, 2 * im, 3 * im])
+        im[2] = np.inf
 
         mask = np.ones_like(im, dtype=np.bool)
         mask[:, 2, 1] = False
@@ -637,10 +681,14 @@ class TestImportantDivergingFunctions(NpyTestCase):
             [
                 np.median(im[0][mask[0]]),
                 np.median(im[1][mask[1]]),
+                np.median(im[2][mask[2]]),
             ]
         )
         self.assertArrayEqual(
-            np.isnan(expected_median), np.array([False, False])
+            np.isnan(expected_median), np.array([False, False, False])
+        )  # self test
+        self.assertArrayEqual(
+            np.isinf(expected_median), np.array([False, False, True])
         )  # self test
 
         self.assertAllclose(actual_median, expected_median)
@@ -655,8 +703,9 @@ class TestImportantDivergingFunctions(NpyTestCase):
             ],
             dtype=np.float32,
         )
-        im = np.stack([im, 2 * im])
-        im[-1, -1, -1] = np.nan
+        im = np.stack([im, 2 * im, 3 * im])
+        im[2] = np.inf
+        im[1, -1, -1] = np.nan
 
         mask = np.ones_like(im, dtype=np.bool)
         mask[:, 2, 1] = False
@@ -670,10 +719,14 @@ class TestImportantDivergingFunctions(NpyTestCase):
             [
                 np.median(im[0][mask[0]]),
                 np.median(im[1][mask[1]]),
+                np.median(im[2][mask[2]]),
             ]
         )
         self.assertArrayEqual(
-            np.isnan(expected_median), np.array([False, True])
+            np.isnan(expected_median), np.array([False, True, False])
+        )  # self test
+        self.assertArrayEqual(
+            np.isinf(expected_median), np.array([False, False, True])
         )  # self test
 
         self.assertAllclose(actual_median, expected_median, equal_nan=True)
@@ -688,7 +741,8 @@ class TestImportantDivergingFunctions(NpyTestCase):
             ],
             dtype=np.float32,
         )
-        im = np.stack([im, 2 * im])
+        im = np.stack([im, 2 * im, 3 * im])
+        im[2] = np.inf
 
         mask = np.ones_like(im, dtype=np.bool)
         mask[:, 2, 1] = False
@@ -702,10 +756,14 @@ class TestImportantDivergingFunctions(NpyTestCase):
             [
                 np.median(im[0][mask[0]]),
                 np.median(im[1][mask[1]]),
+                np.median(im[2][mask[2]]),
             ]
         )
         self.assertArrayEqual(
-            np.isnan(expected_median), np.array([False, False])
+            np.isnan(expected_median), np.array([False, False, False])
+        )  # self test
+        self.assertArrayEqual(
+            np.isinf(expected_median), np.array([False, False, True])
         )  # self test
         expected_median = np.expand_dims(np.expand_dims(expected_median, -1), -1)
 
@@ -721,8 +779,9 @@ class TestImportantDivergingFunctions(NpyTestCase):
             ],
             dtype=np.float32,
         )
-        im = np.stack([im, 2 * im])
-        im[-1, -1, -1] = np.nan
+        im = np.stack([im, 2 * im, 3 * im])
+        im[1, -1, -1] = np.nan
+        im[2] = np.inf
 
         mask = np.ones_like(im, dtype=np.bool)
         mask[:, 2, 1] = False
@@ -736,10 +795,14 @@ class TestImportantDivergingFunctions(NpyTestCase):
             [
                 np.median(im[0][mask[0]]),
                 np.median(im[1][mask[1]]),
+                np.median(im[2][mask[2]]),
             ]
         )
         self.assertArrayEqual(
-            np.isnan(expected_median), np.array([False, True])
+            np.isnan(expected_median), np.array([False, True, False])
+        )  # self test
+        self.assertArrayEqual(
+            np.isinf(expected_median), np.array([False, False, True])
         )  # self test
         expected_median = np.expand_dims(np.expand_dims(expected_median, -1), -1)
 
@@ -885,7 +948,8 @@ class TestImportantDivergingFunctions(NpyTestCase):
             ],
             dtype=np.float32,
         )
-        im = np.stack([im, 2 * im])
+        im = np.stack([im, 2 * im, 3 * im])
+        im[2] = np.inf
         im_tensor = torch.tensor(im, requires_grad=True)
 
         mask = np.ones_like(im, dtype=np.bool)
@@ -903,10 +967,14 @@ class TestImportantDivergingFunctions(NpyTestCase):
             [
                 np.median(im[0][mask[0]]),
                 np.median(im[1][mask[1]]),
+                np.median(im[2][mask[2]]),
             ]
         )
         self.assertArrayEqual(
-            np.isnan(expected_median), np.array([False, False])
+            np.isnan(expected_median), np.array([False, False, False])
+        )  # self test
+        self.assertArrayEqual(
+            np.isinf(expected_median), np.array([False, False, True])
         )  # self test
 
         self.assertAllclose(np.array(actual_median.detach()), expected_median)
@@ -922,8 +990,9 @@ class TestImportantDivergingFunctions(NpyTestCase):
             ],
             dtype=np.float32,
         )
-        im = np.stack([im, 2 * im])
-        im[-1, -1, -1] = np.nan
+        im = np.stack([im, 2 * im, 3 * im])
+        im[2] = np.inf
+        im[1, -1, -1] = np.nan
         im_tensor = torch.tensor(im, requires_grad=True)
 
         mask = np.ones_like(im, dtype=np.bool)
@@ -941,10 +1010,14 @@ class TestImportantDivergingFunctions(NpyTestCase):
             [
                 np.median(im[0][mask[0]]),
                 np.median(im[1][mask[1]]),
+                np.median(im[2][mask[2]]),
             ]
         )
         self.assertArrayEqual(
-            np.isnan(expected_median), np.array([False, True])
+            np.isnan(expected_median), np.array([False, True, False])
+        )  # self test
+        self.assertArrayEqual(
+            np.isinf(expected_median), np.array([False, False, True])
         )  # self test
 
         self.assertAllclose(
@@ -962,7 +1035,8 @@ class TestImportantDivergingFunctions(NpyTestCase):
             ],
             dtype=np.float32,
         )
-        im = np.stack([im, 2 * im])
+        im = np.stack([im, 2 * im, 3 * im])
+        im[2] = np.inf
         im_tensor = torch.tensor(im, requires_grad=True)
 
         mask = np.ones_like(im, dtype=np.bool)
@@ -980,10 +1054,14 @@ class TestImportantDivergingFunctions(NpyTestCase):
             [
                 np.median(im[0][mask[0]]),
                 np.median(im[1][mask[1]]),
+                np.median(im[2][mask[2]]),
             ]
         )
         self.assertArrayEqual(
-            np.isnan(expected_median), np.array([False, False])
+            np.isnan(expected_median), np.array([False, False, False])
+        )  # self test
+        self.assertArrayEqual(
+            np.isinf(expected_median), np.array([False, False, True])
         )  # self test
         expected_median = np.expand_dims(np.expand_dims(expected_median, -1), -1)
 
@@ -1000,8 +1078,9 @@ class TestImportantDivergingFunctions(NpyTestCase):
             ],
             dtype=np.float32,
         )
-        im = np.stack([im, 2 * im])
-        im[-1, -1, -1] = np.nan
+        im = np.stack([im, 2 * im, 3 * im])
+        im[1, -1, -1] = np.nan
+        im[2] = np.inf
         im_tensor = torch.tensor(im, requires_grad=True)
 
         mask = np.ones_like(im, dtype=np.bool)
@@ -1019,10 +1098,14 @@ class TestImportantDivergingFunctions(NpyTestCase):
             [
                 np.median(im[0][mask[0]]),
                 np.median(im[1][mask[1]]),
+                np.median(im[2][mask[2]]),
             ]
         )
         self.assertArrayEqual(
-            np.isnan(expected_median), np.array([False, True])
+            np.isnan(expected_median), np.array([False, True, False])
+        )  # self test
+        self.assertArrayEqual(
+            np.isinf(expected_median), np.array([False, False, True])
         )  # self test
         expected_median = np.expand_dims(np.expand_dims(expected_median, -1), -1)
 
@@ -1031,6 +1114,162 @@ class TestImportantDivergingFunctions(NpyTestCase):
         )
         self.assertGradientsExist(elementwise=True, start=im_tensor, end=actual_median)
         self.assertEqual(len(actual_median.shape), len(im.shape))
+
+    def test_masked_mean__single__nokeepdim__inf(self):
+        im = np.full((1, 4, 5), np.inf, dtype=np.float32)
+        mask = np.ones_like(im, dtype=np.bool)
+
+        expected_mean = np.array(np.inf)
+
+        actual_mean = depth_tools._diverging_functions_internal.masked_mean_unchecked(
+            a=im,
+            mask=mask,
+            along_all_dims_except_0=False,
+            keep_dropped_dims=False,
+        )
+
+        self.assertAllclose(expected_mean, actual_mean)
+        self.assertEqual(actual_mean.shape, expected_mean.shape)
+
+    def test_masked_mean__single__nokeepdim__inf__pt(self):
+        im = np.full((1, 4, 5), np.inf, dtype=np.float32)
+        im_tensor = torch.tensor(im, requires_grad=True)
+        mask = np.ones_like(im, dtype=np.bool)
+
+        expected_mean = np.array(np.inf)
+
+        actual_mean = (
+            depth_tools.pt._diverging_functions_internal.masked_mean_unchecked(
+                a=im_tensor,
+                mask=torch.tensor(mask),
+                along_all_dims_except_0=False,
+                keep_dropped_dims=False,
+            )
+        )
+
+        self.assertAllclose(expected_mean, actual_mean.detach().numpy())
+        self.assertEqual(actual_mean.shape, expected_mean.shape)
+        self.assertGradientsExist(start=im_tensor, end=actual_mean, elementwise=False)
+
+    def test_masked_mean__single__keepdim__inf(self):
+        im = np.full((1, 4, 5), np.inf, dtype=np.float32)
+        mask = np.ones_like(im, dtype=np.bool)
+
+        expected_mean = np.expand_dims(
+            np.expand_dims(np.expand_dims(np.array(np.inf), -1), -1), -1
+        )
+
+        actual_mean = depth_tools._diverging_functions_internal.masked_mean_unchecked(
+            a=im,
+            mask=mask,
+            along_all_dims_except_0=False,
+            keep_dropped_dims=True,
+        )
+
+        self.assertAllclose(expected_mean, actual_mean)
+        self.assertEqual(actual_mean.shape, expected_mean.shape)
+
+    def test_masked_mean__single__keepdim__inf__pt(self):
+        im = np.full((1, 4, 5), np.inf, dtype=np.float32)
+        im_tensor = torch.tensor(im, requires_grad=True)
+        mask = np.ones_like(im, dtype=np.bool)
+
+        expected_mean = np.expand_dims(
+            np.expand_dims(np.expand_dims(np.array(np.inf), -1), -1), -1
+        )
+
+        actual_mean = (
+            depth_tools.pt._diverging_functions_internal.masked_mean_unchecked(
+                a=im_tensor,
+                mask=torch.tensor(mask),
+                along_all_dims_except_0=False,
+                keep_dropped_dims=True,
+            )
+        )
+
+        self.assertAllclose(expected_mean, actual_mean.detach().numpy())
+        self.assertEqual(actual_mean.shape, expected_mean.shape)
+        self.assertGradientsExist(start=im_tensor, end=actual_mean, elementwise=False)
+
+    def test_masked_median__single__nokeepdim__inf(self):
+        im = np.full((1, 4, 5), np.inf, dtype=np.float32)
+        mask = np.ones_like(im, dtype=np.bool)
+
+        expected_median = np.array(np.inf)
+
+        actual_median = (
+            depth_tools._diverging_functions_internal.masked_median_unchecked(
+                a=im,
+                mask=mask,
+                along_all_dims_except_0=False,
+                keep_dropped_dims=False,
+            )
+        )
+
+        self.assertAllclose(expected_median, actual_median)
+        self.assertEqual(expected_median.shape, actual_median.shape)
+
+    def test_masked_median__single__nokeepdim__inf__pt(self):
+        im = np.full((1, 4, 5), np.inf, dtype=np.float32)
+        im_tensor = torch.tensor(im, requires_grad=True)
+        mask = np.ones_like(im, dtype=np.bool)
+
+        expected_median = np.array(np.inf)
+
+        actual_median = (
+            depth_tools.pt._diverging_functions_internal.masked_median_unchecked(
+                a=im_tensor,
+                mask=torch.tensor(mask),
+                along_all_dims_except_0=False,
+                keep_dropped_dims=False,
+            )
+        )
+
+        self.assertAllclose(expected_median, actual_median.detach().numpy())
+        self.assertEqual(expected_median.shape, actual_median.shape)
+        self.assertGradientsExist(start=im_tensor, end=actual_median, elementwise=False)
+
+    def test_masked_median__single__keepdim__inf(self):
+        im = np.full((1, 4, 5), np.inf, dtype=np.float32)
+        mask = np.ones_like(im, dtype=np.bool)
+
+        expected_median = np.expand_dims(
+            np.expand_dims(np.expand_dims(np.array(np.inf), -1), -1), -1
+        )
+
+        actual_median = (
+            depth_tools._diverging_functions_internal.masked_median_unchecked(
+                a=im,
+                mask=mask,
+                along_all_dims_except_0=False,
+                keep_dropped_dims=True,
+            )
+        )
+
+        self.assertAllclose(expected_median, actual_median)
+        self.assertEqual(expected_median.shape, actual_median.shape)
+
+    def test_masked_median__single__keepdim__inf__pt(self):
+        im = np.full((1, 4, 5), np.inf, dtype=np.float32)
+        im_tensor = torch.tensor(im, requires_grad=True)
+        mask = np.ones_like(im, dtype=np.bool)
+
+        expected_median = np.expand_dims(
+            np.expand_dims(np.expand_dims(np.array(np.inf), -1), -1), -1
+        )
+
+        actual_median = (
+            depth_tools.pt._diverging_functions_internal.masked_median_unchecked(
+                a=im_tensor,
+                mask=torch.tensor(mask),
+                along_all_dims_except_0=False,
+                keep_dropped_dims=True,
+            )
+        )
+
+        self.assertAllclose(expected_median, actual_median.detach().numpy())
+        self.assertGradientsExist(start=im_tensor, end=actual_median, elementwise=False)
+        self.assertEqual(expected_median.shape, actual_median.shape)
 
     def assertGradientsExist(
         self,

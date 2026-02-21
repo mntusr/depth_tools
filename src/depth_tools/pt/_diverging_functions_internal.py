@@ -55,16 +55,13 @@ def masked_median_unchecked(
         else:
             return mean_val_arr
     else:
-        a = a.clone()
-        a[~mask] = torch.nan
-        nan_canary = a[mask].min() * 0
-        nanmed_arr = torch.nanmedian(a)
+        median_arr = torch.median(a[mask])
 
         if keep_dropped_dims:
             new_shape = [1] * len(a.shape)
-            return torch.reshape(nanmed_arr, new_shape) + nan_canary
+            return torch.reshape(median_arr, new_shape)
         else:
-            return nanmed_arr + nan_canary
+            return median_arr
 
 
 def masked_mean_unchecked(
@@ -119,16 +116,12 @@ def masked_mean_unchecked(
         else:
             return mean_val_arr
     else:
-        a = a.clone()
-        a[~mask] = torch.nan
-        nan_canary = a[mask].min() * 0
-        nanmean_arr = torch.nanmean(a)
-
+        mean_val = torch.mean(a[mask])
         if keep_dropped_dims:
             new_shape = [1] * len(a.shape)
-            return torch.reshape(nanmean_arr, new_shape) + nan_canary
+            return torch.reshape(mean_val, new_shape)
         else:
-            return nanmean_arr + nan_canary
+            return mean_val
 
 
 def new_full(

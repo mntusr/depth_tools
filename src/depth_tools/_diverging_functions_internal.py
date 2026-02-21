@@ -55,10 +55,13 @@ def masked_median_unchecked(
         else:
             return mean_val_arr
     else:
-        a = a.copy()
-        a[~mask] = np.nan
-        nan_canary = a[mask].min() * 0
-        return np.array(np.nanmedian(a, keepdims=keep_dropped_dims)) + nan_canary
+        median_arr = np.array(np.median(a[mask]))
+
+        if keep_dropped_dims:
+            new_shape = [1] * len(a.shape)
+            median_arr = np.reshape(median_arr, new_shape)
+
+        return median_arr
 
 
 def masked_mean_unchecked(
@@ -113,10 +116,7 @@ def masked_mean_unchecked(
         else:
             return mean_val_arr
     else:
-        a = a.copy()
-        a[~mask] = np.nan
-        nan_canary = a[mask].min() * 0
-        return np.array(np.nanmean(a, keepdims=keep_dropped_dims)) + nan_canary
+        return np.mean(a, where=mask, keepdims=keep_dropped_dims)
 
 
 def new_full(
